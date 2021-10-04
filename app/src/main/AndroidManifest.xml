@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Aurora Store
+  ~  Copyright (C) 2021, Rahul Kumar Patel <whyorean@gmail.com>
+  ~
+  ~  Aurora Store is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 2 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  Aurora Store is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with Aurora Store.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  -->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.aurora.store">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+    <uses-permission android:name="com.saradabar.cpadcustomizetool.permission.ACCESS_DEVICE_OWNER" />
+
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+
+    <uses-feature
+        android:name="android.hardware.gamepad"
+        android:required="false"/>
+
+    <application
+        android:name=".AuroraApplication"
+        android:allowBackup="false"
+        android:banner="@drawable/ic_tv_banner"
+        android:hardwareAccelerated="true"
+        android:icon="@mipmap/ic_launcher"
+        android:killAfterRestore="false"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:name=".StartCheckActivity"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar.TranslucentDecor"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".view.ui.onboarding.OnboardingActivity" />
+
+        <activity
+            android:name=".view.ui.splash.SplashActivity"
+            android:launchMode="singleTask" />
+
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleTask" />
+
+        <activity android:name=".view.ui.details.AppDetailsActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="market" android:host="details" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="market.android.com" />
+                <data android:path="/store/apps/details" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="play.google.com" />
+                <data android:path="/store/apps/details" />
+            </intent-filter>
+        </activity>
+
+
+        <activity android:name=".view.ui.details.DevProfileActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="play.google.com" />
+                <data android:path="/store/apps/dev" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".view.ui.search.SearchSuggestionActivity" />
+        <activity android:name=".view.ui.search.SearchResultsActivity" />
+        <activity android:name=".view.ui.commons.StreamBrowseActivity" />
+        <activity android:name=".view.ui.sale.AppSalesActivity" />
+        <activity android:name=".view.ui.details.ScreenshotActivity" />
+        <activity android:name=".view.ui.all.AppsGamesActivity" />
+        <activity android:name=".view.ui.commons.CategoryBrowseActivity" />
+        <activity android:name=".view.ui.details.DetailsMoreActivity" />
+        <activity android:name=".view.ui.details.DetailsReviewActivity" />
+        <activity android:name=".view.ui.downloads.DownloadActivity" />
+        <activity android:name=".view.ui.account.GoogleActivity" />
+        <activity android:name=".view.ui.spoof.SpoofActivity" />
+        <activity android:name=".view.ui.account.AccountActivity" />
+        <activity android:name=".view.ui.details.DetailsExodusActivity" />
+        <activity android:name=".view.ui.details.DevAppsActivity" />
+        <activity android:name=".view.ui.commons.BlacklistActivity" />
+        <activity android:name=".view.ui.preferences.SettingsActivity" />
+        <activity android:name=".view.ui.about.AboutActivity" />
+        <activity android:name=".view.ui.commons.ExpandedStreamBrowseActivity" />
+        <activity android:name=".view.ui.commons.EditorStreamBrowseActivity" />
+
+        <service android:name=".data.service.NotificationService" />
+        <service android:name=".data.installer.InstallerService" />
+        <service android:name=".data.service.UpdateService" />
+        <service
+            android:name="com.novoda.merlin.MerlinService"
+            android:exported="false" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/paths" />
+        </provider>
+
+        <receiver android:name=".data.receiver.PackageManagerReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_CHANGED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".data.receiver.DownloadResumeReceiver" />
+        <receiver android:name=".data.receiver.DownloadPauseReceiver" />
+        <receiver android:name=".data.receiver.DownloadCancelReceiver" />
+
+        <receiver
+            android:name=".data.receiver.AdministratorReceiver"
+            android:permission="android.permission.BIND_DEVICE_ADMIN"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/administrator" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+</manifest>
