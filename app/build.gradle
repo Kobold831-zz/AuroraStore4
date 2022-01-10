@@ -32,8 +32,8 @@ android {
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 22
 
-        versionCode 1
-        versionName "1.0.0-CTabLabo-Kobold-Release"
+        versionCode 2
+        versionName "1.1.0"
 
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -114,13 +114,19 @@ dependencies {
     //Arch LifeCycle
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
+    //noinspection GradleDependency
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:${versions.lifecycle}")
+    //noinspection GradleDependency
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.lifecycle}")
+    //noinspection GradleDependency
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:${versions.lifecycle}")
 
     //Arch Navigation
+    //noinspection GradleDependency
     implementation("androidx.navigation:navigation-fragment-ktx:${versions.navigation}")
+    //noinspection GradleDependency
     implementation("androidx.navigation:navigation-runtime-ktx:${versions.navigation}")
+    //noinspection GradleDependency
     implementation("androidx.navigation:navigation-ui-ktx:${versions.navigation}")
 
     //UI Addons

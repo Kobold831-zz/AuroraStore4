@@ -86,4 +86,8 @@
     <color name="colorAccent11">#59A8E2</color>
     <color name="colorAccent12">#7289da</color>
     <color name="colorAccent13">#0078D7</color>
+
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="red">#DC143C</color>
 </resources>

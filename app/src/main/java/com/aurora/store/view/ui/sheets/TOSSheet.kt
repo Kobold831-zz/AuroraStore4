@@ -82,12 +82,12 @@ class TOSSheet : BaseBottomSheet() {
         }
 
         B.btnSecondary.setOnClickListener {
-            toast("Bye Bye")
+            toast("同意されないため使用できません")
             task {
-                TimeUnit.SECONDS.sleep(2)
+                TimeUnit.SECONDS.sleep(1)
             } success {
-                requireActivity().finish();
-                exitProcess(0);
+                requireActivity().finishAndRemoveTask()
+                exitProcess(0)
             }
         }
     }

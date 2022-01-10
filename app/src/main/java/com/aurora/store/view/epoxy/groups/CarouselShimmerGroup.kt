@@ -22,8 +22,7 @@ package com.aurora.store.view.epoxy.groups
 import com.airbnb.epoxy.EpoxyModel
 import com.airbnb.epoxy.EpoxyModelGroup
 import com.aurora.store.R
-import com.aurora.store.view.epoxy.views.shimmer.AppViewShimmerModel_
-import com.aurora.store.view.epoxy.views.shimmer.HeaderViewShimmerModel_
+import com.aurora.store.view.epoxy.views.shimmer.*
 import java.util.*
 import kotlin.collections.ArrayList
 

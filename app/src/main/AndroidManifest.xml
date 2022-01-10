@@ -54,7 +54,7 @@
 
         <activity
             android:name=".StartCheckActivity"
-            android:theme="@android:style/Theme.Material.Light.NoActionBar.TranslucentDecor"
+            android:theme="@style/AppTheme"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

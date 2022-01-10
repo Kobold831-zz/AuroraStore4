@@ -22,7 +22,7 @@ package com.aurora.store.view.epoxy.controller
 import com.aurora.gplayapi.data.models.StreamBundle
 import com.aurora.store.view.epoxy.groups.CarouselModelGroup
 import com.aurora.store.view.epoxy.groups.CarouselShimmerGroup
-import com.aurora.store.view.epoxy.views.app.AppListViewModel_
+import com.aurora.store.view.epoxy.views.app.*
 
 open class DetailsCarouselController(private val callbacks: Callbacks) :
     GenericCarouselController(callbacks) {

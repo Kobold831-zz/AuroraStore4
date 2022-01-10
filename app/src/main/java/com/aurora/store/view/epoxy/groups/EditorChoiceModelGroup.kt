@@ -24,8 +24,7 @@ import com.airbnb.epoxy.EpoxyModelGroup
 import com.aurora.gplayapi.data.models.editor.EditorChoiceCluster
 import com.aurora.store.R
 import com.aurora.store.view.epoxy.controller.EditorChoiceController
-import com.aurora.store.view.epoxy.views.EditorHeadViewModel_
-import com.aurora.store.view.epoxy.views.EditorImageViewModel_
+import com.aurora.store.view.epoxy.views.*
 
 class EditorChoiceModelGroup(
     editorChoiceCluster: EditorChoiceCluster,

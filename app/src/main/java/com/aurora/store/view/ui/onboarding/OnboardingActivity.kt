@@ -91,10 +91,6 @@ class OnboardingActivity : BaseActivity() {
             moveBackward()
         }
 
-        if (!Preferences.getBoolean(this, Preferences.PREFERENCE_TOS_READ)) {
-            askToReadTOS()
-        }
-
         onNewIntent(intent)
     }
 

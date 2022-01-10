@@ -43,7 +43,6 @@ import nl.komponents.kovenant.ui.successUi
 import java.lang.reflect.Modifier
 import java.util.concurrent.TimeUnit
 
-
 abstract class BaseActivity : AppCompatActivity(), NetworkProvider.NetworkListener {
 
     protected val gson: Gson = GsonBuilder().excludeFieldsWithModifiers(Modifier.TRANSIENT).create()
@@ -138,18 +137,6 @@ abstract class BaseActivity : AppCompatActivity(), NetworkProvider.NetworkListen
             intent,
             getEmptyActivityBundle()
         )
-    }
-
-    fun askToReadTOS() {
-        task {
-            TimeUnit.SECONDS.sleep(5)
-        } successUi {
-            if (!supportFragmentManager.isDestroyed) {
-                val sheet = TOSSheet.newInstance()
-                sheet.isCancelable = false
-                sheet.show(supportFragmentManager, TOSSheet.TAG)
-            }
-        }
     }
 
     fun showNetworkConnectivitySheet() {

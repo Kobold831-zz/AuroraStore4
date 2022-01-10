@@ -107,10 +107,6 @@ class MainActivity : BaseActivity() {
         attachDrawer()
         attachSearch()
 
-        if (!Preferences.getBoolean(this, Preferences.PREFERENCE_TOS_READ)) {
-            askToReadTOS()
-        }
-
         /*Check only if download to external storage is enabled*/
         if (Preferences.getBoolean(this, Preferences.PREFERENCE_DOWNLOAD_EXTERNAL)) {
             checkExternalStorageAccessPermission()
@@ -183,7 +179,7 @@ class MainActivity : BaseActivity() {
             }
             it.findViewById<TextView>(R.id.txt_name)?.text = getString(R.string.app_name)
             it.findViewById<TextView>(R.id.txt_email)?.text =
-                ("v${BuildConfig.VERSION_NAME}.${BuildConfig.VERSION_CODE}")
+                ("Ver.${BuildConfig.VERSION_NAME}")
         }
 
         B.navigation.setNavigationItemSelectedListener { item: MenuItem ->
