@@ -51,7 +51,7 @@ class AccountActivity : BaseActivity() {
 
     private val URL_TOS = "https://www.google.com/mobile/android/market-tos.html"
     private val URL_LICENSE = "https://gitlab.com/AuroraOSS/AuroraStore/raw/master/LICENSE"
-    private val URL_DISCLAIMER = "https://gitlab.com/AuroraOSS/AuroraStore/raw/master/DISCLAIMER"
+    private val URL_DISCLAIMER = "https://gitlab.com/AuroraOSS/AuroraStore/raw/master/DISCLAIMER.md"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,12 +79,12 @@ class AccountActivity : BaseActivity() {
                 }
 
                 AuthState.Available -> {
-                    updateStatus("Verifying session")
+                    updateStatus("セッションの確認中...")
                     updateActionLayout(false)
                 }
 
                 AuthState.Unavailable -> {
-                    updateStatus("You need to login first")
+                    updateStatus("最初にログインする必要があります")
                     updateActionLayout(true)
                 }
 
@@ -93,7 +93,7 @@ class AccountActivity : BaseActivity() {
                 }
 
                 AuthState.SignedOut -> {
-                    updateStatus("Last session scrapped")
+                    updateStatus("最後のセッションは破棄されました")
                     updateActionLayout(true)
                 }
 
@@ -114,10 +114,10 @@ class AccountActivity : BaseActivity() {
         when (event) {
             is BusEvent.GoogleAAS -> {
                 if (event.success) {
-                    updateStatus("Verifying Google Session")
+                    updateStatus("Googleセッションの確認中...")
                     VM.buildGoogleAuthData(event.email, event.aasToken)
                 } else {
-                    updateStatus("Failed to login via Google")
+                    updateStatus("Google経由でのログインに失敗しました")
                 }
             }
             else -> {
@@ -129,10 +129,10 @@ class AccountActivity : BaseActivity() {
     private fun updateContents() {
         if (accountProvider.isSignedIn()) {
             B.viewFlipper.displayedChild = 1
-            updateStatus("Woah! all good.")
+            updateStatus("うわー！すべて好調です")
         } else {
             B.viewFlipper.displayedChild = 0
-            updateStatus("Login and enjoy.")
+            updateStatus("ログインしてお楽しみください")
         }
 
         updateUserProfile()
@@ -206,7 +206,7 @@ class AccountActivity : BaseActivity() {
                 }
 
                 B.txtName.text = if (authData.isAnonymous)
-                    "Anonymous"
+                    "匿名"
                 else
                     it.name
 

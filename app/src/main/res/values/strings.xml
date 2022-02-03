@@ -398,4 +398,8 @@
     <!-- レイアウト -->
     <string name="layout_update_dialog_update_info">アップデートがあります\nアップデートしてください\nアップデートをしないと利用できません\n\n更新情報：\n</string>
     <string name="layout_update_dialog_update_detail_info">詳細な更新情報</string>
+
+    <!-- ブロッカー -->
+    <string name="un_text_1">すべて無効</string>
+    <string name="un_text_2">すべて有効</string>
 </resources>

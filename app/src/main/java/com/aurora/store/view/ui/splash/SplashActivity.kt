@@ -77,7 +77,7 @@ class SplashActivity : BaseActivity() {
         attachActions()
 
         //Initial status
-        updateStatus("Getting things ready..")
+        updateStatus("準備をしています...")
 
         VM.liveData.observe(this, {
             when (it) {
@@ -86,12 +86,12 @@ class SplashActivity : BaseActivity() {
                 }
 
                 AuthState.Available -> {
-                    updateStatus("Verifying session")
+                    updateStatus("セッションの確認中...")
                     updateActionLayout(false)
                 }
 
                 AuthState.Unavailable -> {
-                    updateStatus("You need to login first")
+                    updateStatus("最初にログインする必要があります")
                     updateActionLayout(true)
                 }
 
@@ -100,7 +100,7 @@ class SplashActivity : BaseActivity() {
                 }
 
                 AuthState.SignedOut -> {
-                    updateStatus("Last session scrapped")
+                    updateStatus("最後のセッションは破棄されました")
                     updateActionLayout(true)
                 }
 
@@ -164,10 +164,10 @@ class SplashActivity : BaseActivity() {
         when (event) {
             is BusEvent.GoogleAAS -> {
                 if (event.success) {
-                    updateStatus("Verifying Google Session")
+                    updateStatus("Googleセッションの確認中...")
                     VM.buildGoogleAuthData(event.email, event.aasToken)
                 } else {
-                    updateStatus("Failed to login via Google")
+                    updateStatus("Google経由でのログインに失敗しました")
                 }
             }
             else -> {

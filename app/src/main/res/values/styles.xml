@@ -96,4 +96,8 @@
         <item name="colorShimmer">@color/colorShimmerBlack</item>
         <item name="colorStroke">@color/colorStrokeBlack</item>
     </style>
+
+    <style name="BlockerTheme" parent="android:Theme.Material.Light">
+        <item name="android:colorAccent">@color/red</item>
+    </style>
 </resources>
