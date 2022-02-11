@@ -26,6 +26,8 @@ import com.aurora.store.check.event.UpdateEventListener;
 import com.aurora.store.view.ui.onboarding.OnboardingActivity;
 import com.aurora.store.view.ui.sheets.TOSSheet;
 
+import java.util.Objects;
+
 public class StartCheckActivity extends AppCompatActivity implements UpdateEventListener {
 
     private DevicePolicyManager mDevicePolicyManager;
@@ -97,7 +99,26 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
 
     public void onSupportUnavailable() {
         cancelLoadingDialog();
-        checkModel();
+        if (checkModel()) {
+            if (!mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
+                new AlertDialog.Builder(this)
+                        .setCancelable(false)
+                        .setIcon(R.drawable.alert)
+                        .setTitle(R.string.dialog_title_common_error)
+                        .setMessage(R.string.dialog_not_device_owner)
+                        .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> finishAndRemoveTask())
+                        .show();
+            } else {
+                if (GET_SETTINGS_FLAG(this) == SETTINGS_NOT_COMPLETED) {
+                    startCheck();
+                } else {
+                    startActivity(new Intent(this, OnboardingActivity.class));
+                    finish();
+                }
+            }
+        } else {
+            errorNotNEO();
+        }
     }
 
     @Override
@@ -210,27 +231,14 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
     }
 
     /* 端末チェック */
-    public void checkModel() {
-        if (!"TAB-A05-BD".equals(Build.MODEL)) {
-            errorNotNEO();
-            return;
-        }
-        if (!mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
-            new AlertDialog.Builder(this)
-                    .setCancelable(false)
-                    .setIcon(R.drawable.alert)
-                    .setTitle(R.string.dialog_title_common_error)
-                    .setMessage(R.string.dialog_not_device_owner)
-                    .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> finishAndRemoveTask())
-                    .show();
-        } else {
-            if (GET_SETTINGS_FLAG(this) == SETTINGS_NOT_COMPLETED) {
-                startCheck();
-            } else {
-                startActivity(new Intent(this, OnboardingActivity.class));
-                finish();
+    public boolean checkModel() {
+        String[] modelName = {"TAB-A05-BD", "TAB-A05-BA1"};
+        for (String string : modelName) {
+            if (Objects.equals(string, Build.MODEL)) {
+                return true;
             }
         }
+        return false;
     }
 
     /* 端末チェックエラー */

@@ -383,7 +383,7 @@
     <string name="dialog_common_yes">はい</string>
     <string name="dialog_common_no">いいえ</string>
     <string name="dialog_clear_owner">解除</string>
-    <string name="dialog_error_not_neo">この端末は”チャレンジパッドNEO”ではありません\nこのアプリは使用できません</string>
+    <string name="dialog_error_not_neo">この端末は”チャレンジパッドNEO・NEXT”ではありません\nこのアプリは使用できません</string>
     <string name="dialog_title_notice_start">利用上の注意</string>
     <string name="dialog_notice_start">このアプリケーションを利用するにあたって「同意する」を押した時点で、CTabWikiの許諾規約およびこの規約に同意するものとし、開発者は一切の問題において責任を負わないものとします</string>
     <string name="dialog_wifi_error">通信エラーが発生しました\nネットワークに接続してください</string>
