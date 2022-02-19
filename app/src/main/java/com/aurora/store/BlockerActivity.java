@@ -2,17 +2,19 @@ package com.aurora.store;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.admin.DevicePolicyManager;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,15 +25,12 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import androidx.appcompat.widget.SwitchCompat;
+import com.saradabar.cpadcustomizetool.service.IDeviceOwnerService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BlockerActivity extends Activity {
-
-    private ComponentName administratorComponent;
-    private DevicePolicyManager mDevicePolicyManager;
 
     @SuppressLint("WrongConstant")
     @Override
@@ -40,8 +39,14 @@ public class BlockerActivity extends Activity {
         setContentView(R.layout.block_un_list);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        administratorComponent = getAdministratorComponent(this);
-        mDevicePolicyManager = (DevicePolicyManager)this.getSystemService("device_policy");
+        if (!bindDchaService()) {
+            new AlertDialog.Builder(this)
+                    .setCancelable(false)
+                    .setMessage("Error")
+                    .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> dialog.dismiss())
+                    .show();
+            return;
+        }
 
         final PackageManager pm = getPackageManager();
         final List<ApplicationInfo> installedAppList = pm.getInstalledApplications(0);
@@ -65,33 +70,91 @@ public class BlockerActivity extends Activity {
         listView.setOnItemClickListener((parent, view, position, id) -> {
             AppData item = dataList.get(position);
             String selectPackage = Uri.fromParts("package", item.packName, null).toString();
-            mDevicePolicyManager.setUninstallBlocked(administratorComponent, selectPackage.replace("package:", ""), !mDevicePolicyManager.isUninstallBlocked(administratorComponent, selectPackage.replace("package:", "")));
-            /* listviewの更新 */
-            listView.invalidateViews();
-        });
+            bindService(new Intent("com.saradabar.cpadcustomizetool.service.DeviceOwnerService").setPackage("com.saradabar.cpadcustomizetool"), new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    IDeviceOwnerService mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service);
+                    try {
+                        mDeviceOwnerService.setUninstallBlocked(selectPackage.replace("package:", ""), !mDeviceOwnerService.isUninstallBlocked(selectPackage.replace("package:", "")));
+                        /* listviewの更新 */
+                        listView.invalidateViews();
+                    } catch (RemoteException ignored) {
+                    }
+                    unbindService(this);
+                }
 
-        final AppListAdapter appListAdapter = new AppListAdapter(this, dataList);
+                @Override
+                public void onServiceDisconnected(ComponentName name) {
+                    unbindService(this);
+                }
+            }, Context.BIND_AUTO_CREATE);
+        });
 
         /* ボタンが押されたならスイッチ一括変更 */
         /* 無効 */
         unDisableButton.setOnClickListener(v -> {
             for (AppData appData : dataList) {
-                mDevicePolicyManager.setUninstallBlocked(administratorComponent, appData.packName, false);
+                bindService(new Intent("com.saradabar.cpadcustomizetool.service.DeviceOwnerService").setPackage("com.saradabar.cpadcustomizetool"), new ServiceConnection() {
+                    @Override
+                    public void onServiceConnected(ComponentName name, IBinder service) {
+                        IDeviceOwnerService mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service);
+                        try {
+                            mDeviceOwnerService.setUninstallBlocked(appData.packName, false);
+                            /* listviewの更新 */
+                            listView.invalidateViews();
+                        } catch (RemoteException ignored) {
+                        }
+                        unbindService(this);
+                    }
+
+                    @Override
+                    public void onServiceDisconnected(ComponentName name) {
+                        unbindService(this);
+                    }
+                }, Context.BIND_AUTO_CREATE);
             }
             ((Switch) AppListAdapter.view.findViewById(R.id.un_switch)).setChecked(false);
-            /* listviewの更新 */
-            listView.invalidateViews();
         });
 
         /* 有効 */
         unEnableButton.setOnClickListener(v -> {
             for (AppData appData : dataList) {
-                mDevicePolicyManager.setUninstallBlocked(administratorComponent, appData.packName, true);
+                bindService(new Intent("com.saradabar.cpadcustomizetool.service.DeviceOwnerService").setPackage("com.saradabar.cpadcustomizetool"), new ServiceConnection() {
+                    @Override
+                    public void onServiceConnected(ComponentName name, IBinder service) {
+                        IDeviceOwnerService mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service);
+                        try {
+                            mDeviceOwnerService.setUninstallBlocked(appData.packName, false);
+                            /* listviewの更新 */
+                            listView.invalidateViews();
+                        } catch (RemoteException ignored) {
+                        }
+                        unbindService(this);
+                    }
+
+                    @Override
+                    public void onServiceDisconnected(ComponentName name) {
+                        unbindService(this);
+                    }
+                }, Context.BIND_AUTO_CREATE);
             }
             ((Switch) AppListAdapter.view.findViewById(R.id.un_switch)).setChecked(true);
-            /* listviewの更新 */
-            listView.invalidateViews();
         });
+    }
+
+    public boolean bindDchaService() {
+        return bindService(new Intent("com.saradabar.cpadcustomizetool.service.DeviceOwnerService").setPackage("com.saradabar.cpadcustomizetool"), new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                IDeviceOwnerService mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service);
+                unbindService(this);
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                unbindService(this);
+            }
+        }, Context.BIND_AUTO_CREATE);
     }
 
     private static class AppData {
@@ -104,17 +167,12 @@ public class BlockerActivity extends Activity {
 
         private final LayoutInflater mInflater;
 
-        private final DevicePolicyManager dpm;
-        private final ComponentName administratorComponent;
-
         @SuppressLint("StaticFieldLeak")
         public static View view;
 
         public AppListAdapter(Context context, List<AppData> dataList) {
             super(context, R.layout.block_un_item);
             mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            administratorComponent = getAdministratorComponent(context);
-            dpm = (DevicePolicyManager)context.getSystemService(DEVICE_POLICY_SERVICE);
             addAll(dataList);
         }
 
@@ -139,7 +197,23 @@ public class BlockerActivity extends Activity {
             holder.textLabel.setText(data.label);
             holder.imageIcon.setImageDrawable(data.icon);
 
-            ((Switch) convertView.findViewById(R.id.un_switch)).setChecked(dpm.isUninstallBlocked(administratorComponent, data.packName));
+            View finalConvertView = convertView;
+            getContext().bindService(new Intent("com.saradabar.cpadcustomizetool.service.DeviceOwnerService").setPackage("com.saradabar.cpadcustomizetool"), new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    IDeviceOwnerService mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service);
+                    try {
+                        ((Switch) finalConvertView.findViewById(R.id.un_switch)).setChecked(mDeviceOwnerService.isUninstallBlocked(data.packName));
+                    } catch (RemoteException ignored) {
+                    }
+                    getContext().unbindService(this);
+                }
+
+                @Override
+                public void onServiceDisconnected(ComponentName name) {
+                    getContext().unbindService(this);
+                }
+            }, Context.BIND_AUTO_CREATE);
 
             return convertView;
         }
@@ -148,10 +222,6 @@ public class BlockerActivity extends Activity {
     private static class ViewHolder {
         TextView textLabel;
         ImageView imageIcon;
-    }
-
-    private static ComponentName getAdministratorComponent(Context context) {
-        return new ComponentName(context, com.aurora.store.data.receiver.AdministratorReceiver.class);
     }
 
     @Override

@@ -87,6 +87,8 @@ kapt {
 }
 
 dependencies {
+    implementation files('libs/KoboldLibrary.jar')
+
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
     //MultiDex for Kitkat support
