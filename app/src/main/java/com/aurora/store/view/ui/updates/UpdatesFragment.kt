@@ -196,7 +196,7 @@ class UpdatesFragment : BaseFragment() {
                     add(
                         UpdateHeaderViewModel_()
                             .id("header_all")
-                            .title("${updateFileMap.size} updates available")
+                            .title("${updateFileMap.size} 個の利用可能なアップデート")
                             .action(
                                 if (VM.updateAllEnqueued)
                                     getString(R.string.action_cancel)

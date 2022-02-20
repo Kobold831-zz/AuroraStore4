@@ -19,21 +19,30 @@
 
 package com.aurora.store.data.installer
 
+import android.app.AlertDialog
 import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageInstaller.SessionParams
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
+import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import com.aurora.extensions.isNAndAbove
 import com.aurora.store.BuildConfig
+import com.aurora.store.R
 import com.aurora.store.util.Log
+import com.saradabar.cpadcustomizetool.service.IDeviceOwnerService
 import org.apache.commons.io.IOUtils
 import java.io.File
 
 class SessionInstaller(context: Context) : InstallerBase(context) {
+
+    private var mDeviceOwnerService: IDeviceOwnerService? = null
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun install(packageName: String, files: List<Any>) {
@@ -51,56 +60,31 @@ class SessionInstaller(context: Context) : InstallerBase(context) {
                 }
             }
 
+            bindDeviceOwnerService()
             xInstall(packageName, uriList)
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun xInstall(packageName: String, uriList: List<Uri>) {
-        val packageInstaller = context.packageManager.packageInstaller
-        val sessionParams = SessionParams(SessionParams.MODE_FULL_INSTALL).apply {
-            setAppPackageName(packageName)
-            if (isNAndAbove()) {
-                setOriginatingUid(android.os.Process.myUid())
-            }
-        }
-        val sessionId = packageInstaller.createSession(sessionParams)
-        val session = packageInstaller.openSession(sessionId)
-
         try {
-            Log.i("Writing splits to session for $packageName")
+            context.bindService(
+                Intent("com.saradabar.cpadcustomizetool.service.DeviceOwnerService").setPackage(
+                    "com.saradabar.cpadcustomizetool"
+                ), object : ServiceConnection {
+                    override fun onServiceConnected(name: ComponentName, service: IBinder) {
+                        mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service)
+                        mDeviceOwnerService?.installPackages(packageName, uriList)
+                        context.unbindService(this)
+                    }
 
-            for (uri in uriList) {
-                val inputStream = context.contentResolver.openInputStream(uri)
-                val outputStream = session.openWrite(
-                    "${packageName}_${System.currentTimeMillis()}",
-                    0,
-                    -1
-                )
-
-                IOUtils.copy(inputStream, outputStream)
-
-                session.fsync(outputStream)
-
-                IOUtils.close(inputStream)
-                IOUtils.close(outputStream)
-            }
-
-            val callBackIntent = Intent(context, InstallerService::class.java)
-            val pendingIntent = PendingIntent.getService(
-                context,
-                sessionId,
-                callBackIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                    override fun onServiceDisconnected(name: ComponentName) {
+                        context.unbindService(this)
+                    }
+                }, Context.BIND_AUTO_CREATE
             )
-
-            Log.i("Starting install session for $packageName")
-            session.commit(pendingIntent.intentSender)
-            session.close()
         } catch (e: Exception) {
-            session.abandon()
             removeFromInstallQueue(packageName)
-
             postError(
                 packageName,
                 e.localizedMessage,
@@ -123,5 +107,22 @@ class SessionInstaller(context: Context) : InstallerBase(context) {
         )
 
         return uri
+    }
+
+    fun bindDeviceOwnerService(): Boolean {
+        return context.bindService(
+            Intent("com.saradabar.cpadcustomizetool.service.DeviceOwnerService").setPackage(
+                "com.saradabar.cpadcustomizetool"
+            ), object : ServiceConnection {
+                override fun onServiceConnected(name: ComponentName, service: IBinder) {
+                    mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service)
+                    context.unbindService(this)
+                }
+
+                override fun onServiceDisconnected(name: ComponentName) {
+                    context.unbindService(this)
+                }
+            }, Context.BIND_AUTO_CREATE
+        )
     }
 }

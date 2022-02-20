@@ -160,10 +160,6 @@ public abstract class Indicator extends Drawable implements Animatable {
         invalidateSelf();
     }
 
-    public Rect getDrawBounds() {
-        return drawBounds;
-    }
-
     public int getWidth() {
         return drawBounds.width();
     }
@@ -171,21 +167,4 @@ public abstract class Indicator extends Drawable implements Animatable {
     public int getHeight() {
         return drawBounds.height();
     }
-
-    public int centerX() {
-        return drawBounds.centerX();
-    }
-
-    public int centerY() {
-        return drawBounds.centerY();
-    }
-
-    public float exactCenterX() {
-        return drawBounds.exactCenterX();
-    }
-
-    public float exactCenterY() {
-        return drawBounds.exactCenterY();
-    }
-
 }

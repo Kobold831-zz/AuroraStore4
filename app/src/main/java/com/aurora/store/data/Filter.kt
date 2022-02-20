@@ -21,7 +21,6 @@ package com.aurora.store.data
 
 class Filter {
     var appsWithAds = true
-    var appsWithIAP = true
     var paidApps = true
     var gsfDependentApps = true
     var rating = 0.0f

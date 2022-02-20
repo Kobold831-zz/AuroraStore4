@@ -38,7 +38,8 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/txt_title"
-        style="@style/AuroraTextStyle.Subtitle.Alt"
+        android:textSize="20sp"
+        android:textColor="@color/colorBlack"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"

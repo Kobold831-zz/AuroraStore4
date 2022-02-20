@@ -67,7 +67,7 @@ class AuthViewModel(application: Application) : BaseAndroidViewModel(application
     }
 
     fun buildGoogleAuthData(email: String, aasToken: String) {
-        updateStatus("Requesting new session")
+        updateStatus("新しいセッションをリクエストしています...")
 
         task {
             var properties = NativeDeviceInfoProvider(getApplication()).getNativeDeviceProperties()
@@ -78,7 +78,7 @@ class AuthViewModel(application: Application) : BaseAndroidViewModel(application
         } success {
             verifyAndSaveAuth(it, AccountType.GOOGLE)
         } fail {
-            updateStatus("Failed to generate Session")
+            updateStatus("セッションの生成に失敗しました")
         }
     }
 
@@ -96,7 +96,7 @@ class AuthViewModel(application: Application) : BaseAndroidViewModel(application
     }
 
     private fun buildSecureAnonymousAuthData() {
-        updateStatus("Requesting new session")
+        updateStatus("新しいセッションをリクエストしています...")
 
         task {
             var properties = NativeDeviceInfoProvider(getApplication())
@@ -119,8 +119,8 @@ class AuthViewModel(application: Application) : BaseAndroidViewModel(application
                 )
             } else {
                 when (playResponse.code) {
-                    404 -> throw Exception("Server unreachable")
-                    429 -> throw Exception("Oops, You are rate limited")
+                    404 -> throw Exception("サーバーに到達できません")
+                    429 -> throw Exception("速度制限されています")
                     else -> throw Exception(playResponse.errorString)
                 }
             }
@@ -134,7 +134,7 @@ class AuthViewModel(application: Application) : BaseAndroidViewModel(application
     }
 
     private fun buildInSecureAnonymousAuthData() {
-        updateStatus("Requesting new session")
+        updateStatus("新しいセッションをリクエストしています...")
 
         task {
             var properties = NativeDeviceInfoProvider(getApplication())
@@ -158,8 +158,8 @@ class AuthViewModel(application: Application) : BaseAndroidViewModel(application
                 )
             } else {
                 when (playResponse.code) {
-                    404 -> throw Exception("Server unreachable")
-                    429 -> throw Exception("Oops, You are rate limited")
+                    404 -> throw Exception("サーバーに到達できません")
+                    429 -> throw Exception("速度制限されています")
                     else -> throw Exception(playResponse.errorString)
                 }
             }
@@ -213,9 +213,9 @@ class AuthViewModel(application: Application) : BaseAndroidViewModel(application
                     }
                 } catch (e: Exception) {
                     when (e) {
-                        is UnknownHostException -> updateStatus("No network")
-                        is ConnectException -> updateStatus("Could not connect to server")
-                        else -> updateStatus("Unknown error")
+                        is UnknownHostException -> updateStatus("圏外")
+                        is ConnectException -> updateStatus("サーバーに接続できませんでした")
+                        else -> updateStatus("不明なエラー")
                     }
                     requestState = RequestState.Pending
                 }
@@ -242,7 +242,7 @@ class AuthViewModel(application: Application) : BaseAndroidViewModel(application
     }
 
     private fun verifyAndSaveAuth(authData: AuthData, type: AccountType) {
-        updateStatus("Verifying new session")
+        updateStatus("新しいセッションの確認をしています...")
 
         if (spoofProvider.isLocaleSpoofEnabled()) {
             authData.locale = spoofProvider.getSpoofLocale()
@@ -259,7 +259,7 @@ class AuthViewModel(application: Application) : BaseAndroidViewModel(application
             liveData.postValue(AuthState.SignedOut)
             requestState = RequestState.Pending
 
-            updateStatus("Failed to verify session")
+            updateStatus("セッションの確認に失敗しました")
         }
     }
 

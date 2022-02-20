@@ -348,7 +348,7 @@ abstract class BaseDetailsActivity : BaseActivity() {
                     .show(supportFragmentManager, PermissionBottomSheet.TAG)
             }
         }
-        B.txtPermissionCount.text = ("${app.permissions.size} permissions")
+        B.txtPermissionCount.text = ("${app.permissions.size} 個の権限")
     }
 
     private fun updateBetaActions(B: LayoutDetailsBetaBinding, isSubscribed: Boolean) {

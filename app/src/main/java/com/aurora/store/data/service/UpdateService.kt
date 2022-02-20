@@ -177,37 +177,8 @@ class UpdateService: LifecycleService() {
 
     data class AppMetadataStatus(val reason: String, val app: App)
 
-    @get:RequiresApi(Build.VERSION_CODES.O)
-    private val notification: Notification
-        get() {
-            val notificationBuilder =
-                NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL_UPDATER_SERVICE)
-            return getNotification(notificationBuilder)
-        }
-
-    private fun getNotification(builder: NotificationCompat.Builder): Notification {
-        return builder.setAutoCancel(true)
-            .setColor(ContextCompat.getColor(this, R.color.colorAccent))
-            .setContentTitle(getString(R.string.app_updater_service_notif_title))
-            .setContentText(getString(R.string.app_updater_service_notif_text))
-            .setOngoing(true)
-            .setSmallIcon(R.drawable.ic_notification_outlined)
-            .build()
-    }
-
     override fun onCreate() {
         super.onCreate()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForeground(1, notification)
-        } else {
-            val notification = getNotification(
-                NotificationCompat.Builder(
-                    this,
-                    Constants.NOTIFICATION_CHANNEL_UPDATER_SERVICE
-                )
-            )
-            startForeground(1, notification)
-        }
         EventBus.getDefault().register(this)
         authData = AuthProvider.with(this).getAuthData()
         purchaseHelper = PurchaseHelper(authData).using(HttpClient.getPreferredClient())

@@ -23,8 +23,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.aurora.extensions.isMIUI
-import com.aurora.extensions.isMiuiOptimizationDisabled
 import com.aurora.store.R
 import com.aurora.store.data.model.Installer
 import com.aurora.store.databinding.FragmentOnboardingInstallerBinding
@@ -33,7 +31,6 @@ import com.aurora.store.util.Preferences.PREFERENCE_INSTALLER_ID
 import com.aurora.store.util.save
 import com.aurora.store.view.epoxy.views.preference.InstallerViewModel_
 import com.aurora.store.view.ui.commons.BaseFragment
-import com.aurora.store.view.ui.sheets.DeviceMiuiSheet
 import com.google.gson.reflect.TypeToken
 import java.nio.charset.StandardCharsets
 
@@ -42,7 +39,7 @@ class InstallerFragment : BaseFragment() {
 
     private lateinit var B: FragmentOnboardingInstallerBinding
 
-    var installerId: Int = 0
+    private var installerId: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -87,10 +84,6 @@ class InstallerFragment : BaseFragment() {
                         }
                 )
             }
-        }
-
-        if (isMIUI() && !isMiuiOptimizationDisabled()) {
-            DeviceMiuiSheet.newInstance().show(childFragmentManager, DeviceMiuiSheet.TAG)
         }
     }
 

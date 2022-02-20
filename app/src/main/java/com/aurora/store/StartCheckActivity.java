@@ -7,13 +7,17 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,17 +29,20 @@ import com.aurora.store.check.Updater;
 import com.aurora.store.check.event.UpdateEventListener;
 import com.aurora.store.view.ui.onboarding.OnboardingActivity;
 import com.aurora.store.view.ui.sheets.TOSSheet;
+import com.saradabar.cpadcustomizetool.service.IDeviceOwnerService;
 
 import java.util.Objects;
 
 public class StartCheckActivity extends AppCompatActivity implements UpdateEventListener {
 
-    private DevicePolicyManager mDevicePolicyManager;
+    private IDeviceOwnerService mDeviceOwnerService;
+    DevicePolicyManager mDevicePolicyManager;
     ProgressDialog loadingDialog;
 
     @Override
     public final void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        bindDeviceOwnerService();
         mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         /* ネットワークチェック */
         if (!isNetWork()) {
@@ -101,13 +108,35 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
         cancelLoadingDialog();
         if (checkModel()) {
             if (!mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
-                new AlertDialog.Builder(this)
-                        .setCancelable(false)
-                        .setIcon(R.drawable.alert)
-                        .setTitle(R.string.dialog_title_common_error)
-                        .setMessage(R.string.dialog_not_device_owner)
-                        .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> finishAndRemoveTask())
-                        .show();
+                if (bindDeviceOwnerService()) {
+                    try {
+                        if (mDeviceOwnerService.isDeviceOwnerApp()) {
+                            if (GET_SETTINGS_FLAG(this) == SETTINGS_NOT_COMPLETED) {
+                                startCheck();
+                            } else {
+                                startActivity(new Intent(this, OnboardingActivity.class));
+                                finish();
+                            }
+                        } else {
+                            new AlertDialog.Builder(this)
+                                    .setCancelable(false)
+                                    .setIcon(R.drawable.alert)
+                                    .setTitle(R.string.dialog_title_common_error)
+                                    .setMessage("DeviceOwnerではありません\nこのアプリは使用できません\n自動回避としてCPad Customize Toolを検出しましたがDeviceOwnerではありません")
+                                    .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> finishAndRemoveTask())
+                                    .show();
+                        }
+                    } catch (RemoteException ignored) {
+                    }
+                } else {
+                    new AlertDialog.Builder(this)
+                            .setCancelable(false)
+                            .setIcon(R.drawable.alert)
+                            .setTitle(R.string.dialog_title_common_error)
+                            .setMessage("DeviceOwnerではありません\nこのアプリは使用できません\n自動回避としてCPad Customize Toolの検出を試みましたが失敗しました")
+                            .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> finishAndRemoveTask())
+                            .show();
+                }
             } else {
                 if (GET_SETTINGS_FLAG(this) == SETTINGS_NOT_COMPLETED) {
                     startCheck();
@@ -228,6 +257,21 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
             if (loadingDialog != null) loadingDialog.dismiss();
         } catch (Exception ignored) {
         }
+    }
+
+    public boolean bindDeviceOwnerService() {
+        return bindService(new Intent("com.saradabar.cpadcustomizetool.service.DeviceOwnerService").setPackage("com.saradabar.cpadcustomizetool"), new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service);
+                unbindService(this);
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                unbindService(this);
+            }
+        }, Context.BIND_AUTO_CREATE);
     }
 
     /* 端末チェック */

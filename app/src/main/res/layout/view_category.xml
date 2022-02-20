@@ -32,7 +32,6 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/txt_name"
-        style="@style/AuroraTextStyle.Line1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
@@ -43,5 +42,6 @@
         android:paddingStart="@dimen/padding_small"
         android:paddingEnd="@dimen/padding_small"
         android:textSize="16sp"
+        android:textColor="@color/colorBlack"
         tools:text="Category" />
 </RelativeLayout>

@@ -26,7 +26,6 @@ import android.graphics.Color
 import android.os.Build
 import android.os.IBinder
 import android.util.ArrayMap
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.aurora.Constants
@@ -37,11 +36,9 @@ import com.aurora.store.R
 import com.aurora.store.data.downloader.DownloadManager
 import com.aurora.store.data.downloader.RequestGroupIdBuilder
 import com.aurora.store.data.event.InstallerEvent
-import com.aurora.store.data.installer.AppInstaller
 import com.aurora.store.data.receiver.DownloadCancelReceiver
 import com.aurora.store.data.receiver.DownloadPauseReceiver
 import com.aurora.store.data.receiver.DownloadResumeReceiver
-import com.aurora.store.data.receiver.InstallReceiver
 import com.aurora.store.util.CommonUtil
 import com.aurora.store.util.Log
 import com.aurora.store.view.ui.details.AppDetailsActivity
@@ -362,18 +359,7 @@ class NotificationService : Service() {
         return PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
-    private fun getInstallIntent(packageName: String, versionCode: String): PendingIntent {
-        val intent = Intent(this, InstallReceiver::class.java)
-        intent.putExtra(Constants.STRING_EXTRA, packageName)
-        return PendingIntent.getBroadcast(
-            this,
-            packageName.hashCode(),
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
-    }
-
-    @Subscribe()
+    @Subscribe
     fun onEventMainThread(event: Any) {
         when (event) {
             is InstallerEvent.Success -> {
@@ -406,20 +392,6 @@ class NotificationService : Service() {
         }
     }
 
-    @Synchronized
-    private fun install(packageName: String, files: List<Download>) {
-        AppInstaller.getInstance(this)
-            .getPreferredInstaller()
-            .install(
-                packageName,
-                files
-                    .filter { it.file.endsWith(".apk") }
-                    .map {
-                        it.file
-                    }.toList()
-            )
-    }
-
     private fun notifyInstallationStatus(app: App, status: String?) {
         val builder = NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL_ALERT)
         builder.color = getStyledAttributeColor(R.attr.colorAccent)
@@ -438,7 +410,7 @@ class NotificationService : Service() {
     override fun onDestroy() {
         Log.i("Notification Service Stopped")
         fetch.removeListener(fetchListener)
-        EventBus.getDefault().unregister(this);
+        EventBus.getDefault().unregister(this)
         super.onDestroy()
     }
 }

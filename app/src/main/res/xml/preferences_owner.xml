@@ -19,14 +19,6 @@
 
     <Preference
         app:iconSpaceReserved="false"
-        android:selectable="false"
-        android:enabled="false"
-        android:title="DeviceOwnerを結合"
-        android:summary="CPad Customize ToolとAurora StoreのDeviceOwnerが競合する問題を解決し、どちらかのDeviceOwner権限を使用します\n選択後に表示されるダイアログで使用するアプリを選択してください"
-        android:key="pref_test_key" />
-
-    <Preference
-        app:iconSpaceReserved="false"
         app:selectable="false"
         android:key="now_set_owner_package" />
 </PreferenceScreen>
