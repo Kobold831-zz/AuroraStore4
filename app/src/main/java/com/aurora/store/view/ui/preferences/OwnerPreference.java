@@ -20,7 +20,9 @@ public class OwnerPreference extends PreferenceFragmentCompat {
 
     private DevicePolicyManager mDevicePolicyManager;
 
-    Preference disableOwner, preferenceBlockToUninstallSettings, preferenceNowSetOwnerApp;
+    Preference preferenceDisableOwner,
+            preferenceBlockToUninstallSettings,
+            preferenceNowSetOwnerApp;
 
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
@@ -29,12 +31,12 @@ public class OwnerPreference extends PreferenceFragmentCompat {
 
         mDevicePolicyManager = (DevicePolicyManager) requireActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
 
-        disableOwner = findPreference("pref_owner_disable");
+        preferenceDisableOwner = findPreference("pref_owner_disable");
         preferenceBlockToUninstallSettings = findPreference("intent_block_to_uninstall_settings");
         preferenceNowSetOwnerApp = findPreference("now_set_owner_package");
 
-        disableOwner.setOnPreferenceClickListener(preference -> {
-            new AlertDialog.Builder(getActivity())
+        preferenceDisableOwner.setOnPreferenceClickListener(preference -> {
+            new AlertDialog.Builder(requireActivity())
                     .setMessage("DeviceOwnerを解除しますか？")
                     .setPositiveButton(R.string.dialog_common_yes, (dialog, which) -> {
                         mDevicePolicyManager.clearDeviceOwnerApp(requireActivity().getPackageName());
@@ -56,6 +58,11 @@ public class OwnerPreference extends PreferenceFragmentCompat {
         if (getNowOwnerPackage() != null) {
             preferenceNowSetOwnerApp.setSummary("DeviceOwnerは" + getNowOwnerPackage() + "に設定されています");
         } else preferenceNowSetOwnerApp.setSummary("DeviceOwnerはデバイスに設定されていません");
+
+        if (!mDevicePolicyManager.isDeviceOwnerApp(requireActivity().getPackageName())) {
+            preferenceDisableOwner.setEnabled(false);
+            preferenceDisableOwner.setSelectable(false);
+        }
     }
 
     private String getNowOwnerPackage() {
