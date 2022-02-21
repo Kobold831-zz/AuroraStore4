@@ -28,17 +28,17 @@
     <string name="download_speed_kb" translatable="false">%1$s KB/s</string>
     <string name="download_speed_mb" translatable="false">%1$s MB/s</string>
 
-    <string name="ui_accent_1">Blue</string>
-    <string name="ui_accent_2">Fuchsia</string>
-    <string name="ui_accent_3">Red</string>
-    <string name="ui_accent_4">Golden</string>
-    <string name="ui_accent_5">Green</string>
-    <string name="ui_accent_6">Purple</string>
-    <string name="ui_accent_7">Grey</string>
-    <string name="ui_accent_8">Pink</string>
-    <string name="ui_accent_9">Lime</string>
-    <string name="ui_accent_10">Orange</string>
-    <string name="ui_accent_11">Light blue</string>
-    <string name="ui_accent_12">Disskord blue</string>
-    <string name="ui_accent_13">Deep blue</string>
+    <string name="ui_accent_1">青色</string>
+    <string name="ui_accent_2">赤紫色</string>
+    <string name="ui_accent_3">赤色</string>
+    <string name="ui_accent_4">黄金色</string>
+    <string name="ui_accent_5">緑色</string>
+    <string name="ui_accent_6">紫色</string>
+    <string name="ui_accent_7">灰色</string>
+    <string name="ui_accent_8">ピンク</string>
+    <string name="ui_accent_9">ライム</string>
+    <string name="ui_accent_10">オレンジ</string>
+    <string name="ui_accent_11">水色</string>
+    <string name="ui_accent_12">Discord</string>
+    <string name="ui_accent_13">深青色</string>
 </resources>

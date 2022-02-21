@@ -127,7 +127,7 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
                                     .setCancelable(false)
                                     .setIcon(R.drawable.alert)
                                     .setTitle(R.string.dialog_title_common_error)
-                                    .setMessage("DeviceOwnerではありません\nこのアプリは使用できません\n自動回避としてCPad Customize Toolを検出しましたがDeviceOwnerではありません")
+                                    .setMessage(R.string.dialog_not_device_owner_failure_no_owner)
                                     .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> finishAndRemoveTask())
                                     .show();
                         }
@@ -138,7 +138,7 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
                             .setCancelable(false)
                             .setIcon(R.drawable.alert)
                             .setTitle(R.string.dialog_title_common_error)
-                            .setMessage("DeviceOwnerではありません\nこのアプリは使用できません\n自動回避としてCPad Customize Toolの検出を試みましたが失敗しました")
+                            .setMessage(R.string.dialog_not_device_owner_failure_bind)
                             .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> finishAndRemoveTask())
                             .show();
                 }

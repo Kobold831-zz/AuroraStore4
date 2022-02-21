@@ -21,6 +21,7 @@ package com.aurora.store.data.installer
 
 import android.app.AlertDialog
 import android.app.PendingIntent
+import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -38,6 +39,7 @@ import com.aurora.store.R
 import com.aurora.store.util.Log
 import com.saradabar.cpadcustomizetool.service.IDeviceOwnerService
 import org.apache.commons.io.IOUtils
+import org.apache.commons.lang3.ClassUtils.getPackageName
 import java.io.File
 
 class SessionInstaller(context: Context) : InstallerBase(context) {
@@ -59,14 +61,68 @@ class SessionInstaller(context: Context) : InstallerBase(context) {
                     }
                 }
             }
-
-            bindDeviceOwnerService()
-            xInstall(packageName, uriList)
+            if ((context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager).isDeviceOwnerApp(
+                    context.getPackageName()
+                )
+            ) {
+                xInstall(packageName, uriList)
+            } else if (bindDeviceOwnerService()) {
+                bindInstall(packageName, uriList)
+            }
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun xInstall(packageName: String, uriList: List<Uri>) {
+        val packageInstaller = context.packageManager.packageInstaller
+        val sessionParams = SessionParams(SessionParams.MODE_FULL_INSTALL).apply {
+            setAppPackageName(packageName)
+            if (isNAndAbove()) {
+                setOriginatingUid(android.os.Process.myUid())
+            }
+        }
+        val sessionId = packageInstaller.createSession(sessionParams)
+        val session = packageInstaller.openSession(sessionId)
+
+        try {
+            Log.i("Writing splits to session for $packageName")
+
+            for (uri in uriList) {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val outputStream = session.openWrite(
+                    "${packageName}_${System.currentTimeMillis()}",
+                    0,
+                    -1
+                )
+
+                IOUtils.copy(inputStream, outputStream)
+
+                session.fsync(outputStream)
+
+                IOUtils.close(inputStream)
+                IOUtils.close(outputStream)
+            }
+
+            val callBackIntent = Intent(context, InstallerService::class.java)
+            val pendingIntent = PendingIntent.getService(
+                context,
+                sessionId,
+                callBackIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
+            session.commit(pendingIntent.intentSender)
+            session.close()
+        } catch (e: Exception) {
+            session.abandon()
+            removeFromInstallQueue(packageName)
+            postError(
+                packageName,
+                e.localizedMessage,
+                e.stackTraceToString()
+            )
+        }
+    }
+
+    private fun bindInstall(packageName: String, uriList: List<Uri>) {
         try {
             context.bindService(
                 Intent("com.saradabar.cpadcustomizetool.service.DeviceOwnerService").setPackage(

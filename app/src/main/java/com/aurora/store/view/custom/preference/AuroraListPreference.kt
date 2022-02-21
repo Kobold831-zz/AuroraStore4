@@ -20,9 +20,19 @@
 package com.aurora.store.view.custom.preference
 
 import android.content.Context
+import android.util.AttributeSet
 import androidx.preference.ListPreference
 
-class AuroraListPreference(context: Context) : ListPreference(context) {
+class AuroraListPreference : ListPreference {
+
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        defStyleAttr: Int,
+        defStyleRes: Int
+    ) : super(context, attrs, defStyleAttr, defStyleRes)
 
     override fun getPersistedString(defaultReturnValue: String?): String? {
         return getPersistedInt(-1).toString()

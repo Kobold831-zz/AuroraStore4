@@ -44,7 +44,7 @@
     <string name="about_bhim_summary">UPIで寄付</string>
     <string name="about_bhim">BHIM - UPI</string>
     <string name="onboarding_permission_esa">外部ストレージへのアクセス</string>
-    <string name="onboarding_welcome_select">ようこそ</string>
+    <string name="onboarding_welcome_select">確認してください</string>
     <string name="onboarding_tos_error">利用規約を読み、チェックしてください。</string>
     <string name="onboarding_tos_confirmation">Aurora Storeの利用規約を読みました。</string>
     <string name="onboarding_tos_desc">Aurora Storeを使用する前に利用規約を読み、同意してください。</string>
@@ -56,7 +56,7 @@
     <string name="onboarding_title_accent">アクセント</string>
     <string name="onboarding_theme_select">選択してください</string>
     <string name="onboarding_permission_select">Aurora Storeは以下の権限が必要です</string>
-    <string name="onboarding_installer_select">インストーラを選択</string>
+    <string name="onboarding_installer_select">選択してください</string>
     <string name="notification_installation_auto">インストール</string>
     <string name="notification_channel_general">一般通知</string>
     <string name="notification_channel_alert">クイック通知</string>
@@ -389,7 +389,8 @@
     <string name="dialog_wifi_error">通信エラーが発生しました\nネットワークに接続してください</string>
     <string name="dialog_connection_error">サーバーと接続できませんでした\n通信状態を確認してください</string>
     <string name="dialog_not_use">このアプリは使用できません</string>
-    <string name="dialog_not_device_owner">DeviceOwnerではありません\nこのアプリは使用できません</string>
+    <string name="dialog_not_device_owner_failure_bind">DeviceOwnerではないためこのアプリは使用できません\n自動回避としてCPad Customize Toolの検出を試みましたが失敗しました</string>
+    <string name="dialog_not_device_owner_failure_no_owner">DeviceOwnerではないためこのアプリは使用できません\n自動回避としてCPad Customize Toolを検出しましたがDeviceOwnerではありません</string>
     <string name="dialog_update_caution">ご利用のデバイスではコンピュータ経由でアップデートする必要があります\n遷移先のページより新しいバージョンのapkファイルをダウンロードしてadbでインストールしてください</string>
 
     <!-- トースト -->
