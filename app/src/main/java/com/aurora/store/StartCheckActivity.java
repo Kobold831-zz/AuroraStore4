@@ -19,6 +19,11 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -310,34 +315,42 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
 
     /* 初回起動お知らせ */
     public void startCheck() {
-        TOSSheet tos = TOSSheet.newInstance();
-        tos.setCancelable(false);
-        tos.show(getSupportFragmentManager(), "");
-
-        new AlertDialog.Builder(this)
-                .setCancelable(false)
-                .setIcon(R.drawable.alert)
-                .setTitle(R.string.dialog_title_notice_start)
-                .setMessage(R.string.dialog_notice_start)
-                .setPositiveButton(R.string.dialog_agree, (dialog, which) -> {
-                    SET_SETTINGS_FLAG(SETTINGS_COMPLETED, this);
-                    startActivity(new Intent(this, OnboardingActivity.class));
-                    finish();
-                })
-                .setNegativeButton(R.string.dialog_disagree, (dialog, which) -> {
-                    if (mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
-                        new AlertDialog.Builder(this)
-                                .setCancelable(false)
-                                .setMessage(R.string.dialog_clear_device_owner)
-                                .setPositiveButton(R.string.dialog_common_yes, (dialog2, which2) -> {
-                                    mDevicePolicyManager.clearDeviceOwnerApp(getPackageName());
-                                    finishAndRemoveTask();
-                                })
-                                .setNegativeButton(R.string.dialog_common_no, (dialog2, which2) -> finishAndRemoveTask())
-                                .show();
-                    } else finishAndRemoveTask();
-                })
-                .show();
+        View view = getLayoutInflater().inflate(R.layout.sheet_tos, null);
+        Button button = view.findViewById(R.id.btn_primary);
+        button.setEnabled(false);
+        CheckBox checkBox = view.findViewById(R.id.checkbox_accept);
+        checkBox.setOnCheckedChangeListener((compoundButton, bool) -> button.setEnabled(bool));
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this, R.style.MyTheme);
+        alertDialog.setView(view).setCancelable(false);
+        AlertDialog alertDialog1 = alertDialog.create();
+        alertDialog1.show();
+        button.setOnClickListener(view1 -> {
+            alertDialog1.dismiss();
+            new AlertDialog.Builder(this)
+                    .setCancelable(false)
+                    .setIcon(R.drawable.alert)
+                    .setTitle(R.string.dialog_title_notice_start)
+                    .setMessage(R.string.dialog_notice_start)
+                    .setPositiveButton(R.string.dialog_agree, (dialog, which) -> {
+                        SET_SETTINGS_FLAG(SETTINGS_COMPLETED, this);
+                        startActivity(new Intent(this, OnboardingActivity.class));
+                        finish();
+                    })
+                    .setNegativeButton(R.string.dialog_disagree, (dialog, which) -> {
+                        if (mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
+                            new AlertDialog.Builder(this)
+                                    .setCancelable(false)
+                                    .setMessage(R.string.dialog_clear_device_owner)
+                                    .setPositiveButton(R.string.dialog_common_yes, (dialog2, which2) -> {
+                                        mDevicePolicyManager.clearDeviceOwnerApp(getPackageName());
+                                        finishAndRemoveTask();
+                                    })
+                                    .setNegativeButton(R.string.dialog_common_no, (dialog2, which2) -> finishAndRemoveTask())
+                                    .show();
+                        } else finishAndRemoveTask();
+                    })
+                    .show();
+        });
     }
 
     @Override
