@@ -41,7 +41,8 @@
         app:fontFamily="@font/montserrat_regular" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        style="@style/AuroraTextStyle.Subtitle.Alt"
+        android:textSize="18sp"
+        android:textColor="@color/colorBlack"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/padding_normal"
