@@ -30,7 +30,6 @@ import com.airbnb.epoxy.OnViewRecycled
 import com.aurora.store.R
 import com.aurora.store.databinding.ViewHeaderBinding
 
-
 @ModelView(
     autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT,
     baseModelClass = BaseView::class
@@ -67,8 +66,8 @@ class HeaderView : RelativeLayout {
 
     @JvmOverloads
     @ModelProp
-    fun browseUrl(@Nullable browseUrl: String = String()) {
-        if (browseUrl.isEmpty())
+    fun browseUrl(@Nullable browseUrl: String? = String()) {
+        if (browseUrl.isNullOrEmpty())
             B.imgAction.visibility = INVISIBLE
     }
 

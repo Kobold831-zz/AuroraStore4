@@ -19,12 +19,8 @@
 
 package com.aurora.store
 
-import android.Manifest
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -43,7 +39,6 @@ import com.aurora.extensions.*
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.store.data.providers.AuthProvider
 import com.aurora.store.databinding.ActivityMainBinding
-import com.aurora.store.util.Log
 import com.aurora.store.util.Preferences
 import com.aurora.store.view.ui.about.AboutActivity
 import com.aurora.store.view.ui.account.AccountActivity
@@ -57,7 +52,6 @@ import com.aurora.store.view.ui.search.SearchSuggestionActivity
 import com.aurora.store.view.ui.spoof.SpoofActivity
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.livinglifetechway.quickpermissions_kotlin.runWithPermissions
 
 class MainActivity : BaseActivity() {
 
@@ -106,12 +100,6 @@ class MainActivity : BaseActivity() {
         attachNavigation()
         attachDrawer()
         attachSearch()
-
-        /*Check only if download to external storage is enabled*/
-        if (Preferences.getBoolean(this, Preferences.PREFERENCE_DOWNLOAD_EXTERNAL)) {
-            checkExternalStorageAccessPermission()
-            checkExternalStorageManagerPermission()
-        }
     }
 
     private fun attachToolbar() {
@@ -159,15 +147,12 @@ class MainActivity : BaseActivity() {
         }
 
         val defaultTab = Preferences.getInteger(this, Preferences.PREFERENCE_DEFAULT_SELECTED_TAB)
-        val graph = navController.graph
 
         when (defaultTab) {
-            0 -> graph.startDestination = R.id.navigation_apps
-            1 -> graph.startDestination = R.id.navigation_games
-            2 -> graph.startDestination = R.id.navigation_updates
+            0 -> navController.navigate(R.id.navigation_apps)
+            1 -> navController.navigate(R.id.navigation_games)
+            2 -> navController.navigate(R.id.navigation_updates)
         }
-
-        navController.graph = graph
     }
 
     private fun attachDrawer() {
@@ -231,20 +216,6 @@ class MainActivity : BaseActivity() {
                     Toast.makeText(this, getString(R.string.toast_double_press_to_exit), Toast.LENGTH_SHORT).show()
                 }
             }
-        }
-    }
-
-    private fun checkExternalStorageAccessPermission() = runWithPermissions(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
-    ) {
-        Log.i("Required permissions available")
-    }
-
-    private fun checkExternalStorageManagerPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager())
-                startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
         }
     }
 }

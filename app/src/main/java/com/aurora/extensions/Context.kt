@@ -44,9 +44,6 @@ import kotlin.system.exitProcess
 val Context.inflater: LayoutInflater
     get() = LayoutInflater.from(this)
 
-val Context.displayMetrics: DisplayMetrics
-    get() = resources.displayMetrics
-
 fun Context.browse(url: String) {
     try {
         startActivity(

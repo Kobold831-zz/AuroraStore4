@@ -392,6 +392,7 @@
     <string name="dialog_not_device_owner_failure_bind">DeviceOwnerではないためこのアプリは使用できません\n自動回避としてCPad Customize Toolの検出を試みましたが失敗しました</string>
     <string name="dialog_not_device_owner_failure_no_owner">DeviceOwnerではないためこのアプリは使用できません\n自動回避としてCPad Customize Toolを検出しましたがDeviceOwnerではありません</string>
     <string name="dialog_update_caution">ご利用のデバイスではコンピュータ経由でアップデートする必要があります\n遷移先のページより新しいバージョンのapkファイルをダウンロードしてadbでインストールしてください</string>
+    <string name="dialog_error">エラーが発生しました\n</string>
 
     <!-- トースト -->
     <string name="toast_unknown_activity">ブラウザを開けませんでした</string>

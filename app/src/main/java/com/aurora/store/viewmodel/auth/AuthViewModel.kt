@@ -133,7 +133,7 @@ class AuthViewModel(application: Application) : BaseAndroidViewModel(application
         }
     }
 
-    private fun buildInSecureAnonymousAuthData() {
+    fun buildInSecureAnonymousAuthData() {
         updateStatus("新しいセッションをリクエストしています...")
 
         task {

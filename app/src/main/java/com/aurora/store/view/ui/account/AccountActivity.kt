@@ -129,7 +129,7 @@ class AccountActivity : BaseActivity() {
     private fun updateContents() {
         if (accountProvider.isSignedIn()) {
             B.viewFlipper.displayedChild = 1
-            updateStatus("うわー！すべて好調です")
+            updateStatus("すべて良いです")
         } else {
             B.viewFlipper.displayedChild = 0
             updateStatus("ログインしてお楽しみください")

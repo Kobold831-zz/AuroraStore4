@@ -1,7 +1,15 @@
 package com.aurora.store;
 
-import static com.aurora.store.Common.*;
-import static com.aurora.store.Common.Variable.*;
+import static com.aurora.store.Common.GET_SETTINGS_FLAG;
+import static com.aurora.store.Common.SET_SETTINGS_FLAG;
+import static com.aurora.store.Common.Variable.REQUEST_UPDATE;
+import static com.aurora.store.Common.Variable.SETTINGS_COMPLETED;
+import static com.aurora.store.Common.Variable.SETTINGS_NOT_COMPLETED;
+import static com.aurora.store.Common.Variable.SUPPORT_CHECK_URL;
+import static com.aurora.store.Common.Variable.UPDATE_CHECK_URL;
+import static com.aurora.store.Common.Variable.UPDATE_INFO_URL;
+import static com.aurora.store.Common.Variable.UPDATE_URL;
+import static com.aurora.store.Common.Variable.toast;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -17,30 +25,27 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.aurora.Constants;
+import com.aurora.extensions.ContextKt;
 import com.aurora.store.check.Checker;
 import com.aurora.store.check.Updater;
 import com.aurora.store.check.event.UpdateEventListener;
 import com.aurora.store.view.ui.onboarding.OnboardingActivity;
-import com.aurora.store.view.ui.sheets.TOSSheet;
 import com.saradabar.cpadcustomizetool.service.IDeviceOwnerService;
 
 import java.util.Objects;
 
 public class StartCheckActivity extends AppCompatActivity implements UpdateEventListener {
 
-    private IDeviceOwnerService mDeviceOwnerService;
+    IDeviceOwnerService mDeviceOwnerService;
     DevicePolicyManager mDevicePolicyManager;
     ProgressDialog loadingDialog;
 
@@ -131,7 +136,14 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
                                     .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> finishAndRemoveTask())
                                     .show();
                         }
-                    } catch (RemoteException ignored) {
+                    } catch (Exception e) {
+                        new AlertDialog.Builder(this)
+                                .setCancelable(false)
+                                .setIcon(R.drawable.alert)
+                                .setTitle(R.string.dialog_title_common_error)
+                                .setMessage(getResources().getString(R.string.dialog_error) + e.getMessage())
+                                .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> finishAndRemoveTask())
+                                .show();
                     }
                 } else {
                     new AlertDialog.Builder(this)
@@ -265,18 +277,22 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
     }
 
     public boolean bindDeviceOwnerService() {
-        return bindService(new Intent("com.saradabar.cpadcustomizetool.service.DeviceOwnerService").setPackage("com.saradabar.cpadcustomizetool"), new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service);
-                unbindService(this);
-            }
+        try {
+            return bindService(new Intent("com.saradabar.cpadcustomizetool.service.DeviceOwnerService").setPackage("com.saradabar.cpadcustomizetool"), new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service);
+                    unbindService(this);
+                }
 
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                unbindService(this);
-            }
-        }, Context.BIND_AUTO_CREATE);
+                @Override
+                public void onServiceDisconnected(ComponentName name) {
+                    unbindService(this);
+                }
+            }, Context.BIND_AUTO_CREATE);
+        } catch (Exception ignored) {
+            return false;
+        }
     }
 
     /* 端末チェック */
@@ -317,6 +333,8 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
     public void startCheck() {
         View view = getLayoutInflater().inflate(R.layout.sheet_tos, null);
         Button button = view.findViewById(R.id.btn_primary);
+        Button button1 = view.findViewById(R.id.btn_secondary);
+        Button button2 = view.findViewById(R.id.btn_read);
         button.setEnabled(false);
         CheckBox checkBox = view.findViewById(R.id.checkbox_accept);
         checkBox.setOnCheckedChangeListener((compoundButton, bool) -> button.setEnabled(bool));
@@ -332,6 +350,7 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
                     .setTitle(R.string.dialog_title_notice_start)
                     .setMessage(R.string.dialog_notice_start)
                     .setPositiveButton(R.string.dialog_agree, (dialog, which) -> {
+
                         SET_SETTINGS_FLAG(SETTINGS_COMPLETED, this);
                         startActivity(new Intent(this, OnboardingActivity.class));
                         finish();
@@ -351,6 +370,8 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
                     })
                     .show();
         });
+        button1.setOnClickListener(view12 -> finishAndRemoveTask());
+        button2.setOnClickListener(view13 -> ContextKt.browse(this, Constants.TOS_URL));
     }
 
     @Override
