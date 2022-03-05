@@ -146,23 +146,9 @@ class NotificationService : Service() {
             val channels = ArrayList<NotificationChannel>()
             channels.add(
                 NotificationChannel(
-                    Constants.NOTIFICATION_CHANNEL_ALERT,
-                    getString(R.string.notification_channel_alert),
-                    NotificationManager.IMPORTANCE_HIGH
-                )
-            )
-            channels.add(
-                NotificationChannel(
                     Constants.NOTIFICATION_CHANNEL_GENERAL,
                     getString(R.string.notification_channel_general),
-                    NotificationManager.IMPORTANCE_MIN
-                )
-            )
-            channels.add(
-                NotificationChannel(
-                    Constants.NOTIFICATION_CHANNEL_UPDATER_SERVICE,
-                    getString(R.string.notification_channel_updater_service),
-                    NotificationManager.IMPORTANCE_MIN
+                    NotificationManager.IMPORTANCE_DEFAULT
                 )
             )
             notificationManager.createNotificationChannels(channels)
@@ -363,7 +349,8 @@ class NotificationService : Service() {
     fun onEventMainThread(event: Any) {
         when (event) {
             is InstallerEvent.Success -> {
-                val groupIDsOfPackageName = RequestGroupIdBuilder.getGroupIDsForApp(this, event.packageName.hashCode())
+                val groupIDsOfPackageName =
+                    RequestGroupIdBuilder.getGroupIDsForApp(this, event.packageName.hashCode())
                 var app: App? = null
                 for (item in groupIDsOfPackageName) {
                     app = appMap[item]
@@ -375,7 +362,8 @@ class NotificationService : Service() {
                     notifyInstallationStatus(app, event.extra)
             }
             is InstallerEvent.Failed -> {
-                val groupIDsOfPackageName = RequestGroupIdBuilder.getGroupIDsForApp(this, event.packageName.hashCode())
+                val groupIDsOfPackageName =
+                    RequestGroupIdBuilder.getGroupIDsForApp(this, event.packageName.hashCode())
                 var app: App? = null
                 for (item in groupIDsOfPackageName) {
                     app = appMap[item]
@@ -386,19 +374,18 @@ class NotificationService : Service() {
                 if (app != null)
                     notifyInstallationStatus(app, event.error)
             }
-            else -> {
-
-            }
         }
     }
 
     private fun notifyInstallationStatus(app: App, status: String?) {
-        val builder = NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL_ALERT)
+        val builder = NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL_GENERAL)
         builder.color = getStyledAttributeColor(R.attr.colorAccent)
         builder.setSmallIcon(R.drawable.ic_install)
         builder.setContentTitle(app.displayName)
         builder.setContentText(status)
         builder.setSubText(app.packageName)
+        builder.setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        builder.setDefaults(Notification.DEFAULT_ALL)
 
         notificationManager.notify(
             app.packageName,

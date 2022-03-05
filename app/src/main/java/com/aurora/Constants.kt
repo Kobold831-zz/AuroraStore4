@@ -31,9 +31,7 @@ object Constants {
     const val SHARE_URL = "https://play.google.com/store/apps/details?id="
     const val TOS_URL = "https://gitlab.com/AuroraOSS/AuroraStore/-/blob/master/TermsOfService.md"
 
-    const val NOTIFICATION_CHANNEL_ALERT = "NOTIFICATION_CHANNEL_ALERT"
     const val NOTIFICATION_CHANNEL_GENERAL = "NOTIFICATION_CHANNEL_GENERAL"
-    const val NOTIFICATION_CHANNEL_UPDATER_SERVICE = "NOTIFICATION_CHANNEL_UPDATER_SERVICE"
 
     const val URL_DISPENSER = "https://auroraoss.com/api/auth"
 

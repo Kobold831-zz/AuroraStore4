@@ -19,7 +19,6 @@
 
 package com.aurora.store.data.installer
 
-import android.app.AlertDialog
 import android.app.PendingIntent
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
@@ -29,22 +28,19 @@ import android.content.ServiceConnection
 import android.content.pm.PackageInstaller.SessionParams
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import com.aurora.extensions.isNAndAbove
 import com.aurora.store.BuildConfig
-import com.aurora.store.R
 import com.aurora.store.util.Log
-import com.saradabar.cpadcustomizetool.service.IDeviceOwnerService
+import com.saradabar.cpadcustomizetool.data.service.IDeviceOwnerService
 import org.apache.commons.io.IOUtils
-import org.apache.commons.lang3.ClassUtils.getPackageName
 import java.io.File
 
 class SessionInstaller(context: Context) : InstallerBase(context) {
 
-    private var mDeviceOwnerService: IDeviceOwnerService? = null
+    var mDeviceOwnerService: IDeviceOwnerService? = null
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun install(packageName: String, files: List<Any>) {
@@ -67,7 +63,7 @@ class SessionInstaller(context: Context) : InstallerBase(context) {
             ) {
                 xInstall(packageName, uriList)
             } else if (bindDeviceOwnerService()) {
-                bindInstall(packageName, uriList)
+                ownerInstall(packageName, uriList)
             }
         }
     }
@@ -122,23 +118,17 @@ class SessionInstaller(context: Context) : InstallerBase(context) {
         }
     }
 
-    private fun bindInstall(packageName: String, uriList: List<Uri>) {
+    private fun ownerInstall(packageName: String, uriList: List<Uri>) {
         try {
-            context.bindService(
-                Intent("com.saradabar.cpadcustomizetool.service.DeviceOwnerService").setPackage(
-                    "com.saradabar.cpadcustomizetool"
-                ), object : ServiceConnection {
-                    override fun onServiceConnected(name: ComponentName, service: IBinder) {
-                        mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service)
-                        mDeviceOwnerService?.installPackages(packageName, uriList)
-                        context.unbindService(this)
-                    }
-
-                    override fun onServiceDisconnected(name: ComponentName) {
-                        context.unbindService(this)
-                    }
-                }, Context.BIND_AUTO_CREATE
-            )
+            Thread.sleep(1000)
+            if(!mDeviceOwnerService?.installPackages(packageName, uriList)!!) {
+                removeFromInstallQueue(packageName)
+                postError(
+                    packageName,
+                    "エラー",
+                    ""
+                )
+            }
         } catch (e: Exception) {
             removeFromInstallQueue(packageName)
             postError(
@@ -166,19 +156,22 @@ class SessionInstaller(context: Context) : InstallerBase(context) {
     }
 
     fun bindDeviceOwnerService(): Boolean {
-        return context.bindService(
-            Intent("com.saradabar.cpadcustomizetool.service.DeviceOwnerService").setPackage(
-                "com.saradabar.cpadcustomizetool"
-            ), object : ServiceConnection {
-                override fun onServiceConnected(name: ComponentName, service: IBinder) {
-                    mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service)
-                    context.unbindService(this)
-                }
+        try {
+            return context.bindService(
+                Intent("com.saradabar.cpadcustomizetool.data.service.DeviceOwnerService").setPackage(
+                    "com.saradabar.cpadcustomizetool"
+                ), object : ServiceConnection {
+                    override fun onServiceConnected(name: ComponentName, service: IBinder) {
+                        mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service)
+                    }
 
-                override fun onServiceDisconnected(name: ComponentName) {
-                    context.unbindService(this)
-                }
-            }, Context.BIND_AUTO_CREATE
-        )
+                    override fun onServiceDisconnected(name: ComponentName) {
+                        context.unbindService(this)
+                    }
+                }, Context.BIND_AUTO_CREATE
+            )
+        } catch (ignored: Exception) {
+            return false
+        }
     }
 }

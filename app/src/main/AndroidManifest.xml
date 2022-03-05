@@ -106,7 +106,6 @@
             </intent-filter>
         </activity>
 
-
         <activity android:name=".view.ui.details.DevProfileActivity"
             android:exported="true">
             <intent-filter>
@@ -147,9 +146,20 @@
         <service android:name=".data.service.NotificationService" />
         <service android:name=".data.installer.InstallerService" />
         <service android:name=".data.service.UpdateService" />
+
         <service
             android:name="com.novoda.merlin.MerlinService"
             android:exported="false" />
+
+        <service
+            android:name=".data.service.ResultService"
+            android:exported="true"
+            android:permission="com.saradabar.cpadcustomizetool.permission.ACCESS_DEVICE_OWNER"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="com.aurora.store.data.service.ResultService"/>
+            </intent-filter>
+        </service>
 
         <provider
             android:name="androidx.core.content.FileProvider"

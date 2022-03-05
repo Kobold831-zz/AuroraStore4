@@ -26,7 +26,7 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.saradabar.cpadcustomizetool.service.IDeviceOwnerService;
+import com.saradabar.cpadcustomizetool.data.service.IDeviceOwnerService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +88,7 @@ public class BlockerActivity extends Activity {
                 /* listviewの更新 */
                 listView.invalidateViews();
             } else {
-                bindService(new Intent("com.saradabar.cpadcustomizetool.service.DeviceOwnerService").setPackage("com.saradabar.cpadcustomizetool"), new ServiceConnection() {
+                bindService(new Intent("com.saradabar.cpadcustomizetool.data.service.DeviceOwnerService").setPackage("com.saradabar.cpadcustomizetool"), new ServiceConnection() {
                     @Override
                     public void onServiceConnected(ComponentName name, IBinder service) {
                         IDeviceOwnerService mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service);

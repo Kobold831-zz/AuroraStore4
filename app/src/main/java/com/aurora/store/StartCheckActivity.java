@@ -39,7 +39,7 @@ import com.aurora.store.check.Checker;
 import com.aurora.store.check.Updater;
 import com.aurora.store.check.event.UpdateEventListener;
 import com.aurora.store.view.ui.onboarding.OnboardingActivity;
-import com.saradabar.cpadcustomizetool.service.IDeviceOwnerService;
+import com.saradabar.cpadcustomizetool.data.service.IDeviceOwnerService;
 
 import java.util.Objects;
 
@@ -278,7 +278,7 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
 
     public boolean bindDeviceOwnerService() {
         try {
-            return bindService(new Intent("com.saradabar.cpadcustomizetool.service.DeviceOwnerService").setPackage("com.saradabar.cpadcustomizetool"), new ServiceConnection() {
+            return bindService(new Intent("com.saradabar.cpadcustomizetool.data.service.DeviceOwnerService").setPackage("com.saradabar.cpadcustomizetool"), new ServiceConnection() {
                 @Override
                 public void onServiceConnected(ComponentName name, IBinder service) {
                     mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service);
