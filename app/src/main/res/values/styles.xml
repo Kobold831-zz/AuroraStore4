@@ -96,10 +96,6 @@
         <item name="colorStroke">@color/colorStrokeBlack</item>
     </style>
 
-    <style name="BlockerTheme" parent="android:Theme.Material.Light">
-        <item name="android:colorAccent">@color/red</item>
-    </style>
-
     <style name="MyTheme" parent="Theme.AppCompat.Light.Dialog">
         <item name="dialogCornerRadius">12dp</item>
     </style>

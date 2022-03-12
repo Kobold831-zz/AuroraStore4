@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
   ~ Aurora Store
   ~  Copyright (C) 2021, Rahul Kumar Patel <whyorean@gmail.com>
   ~
@@ -53,7 +55,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".StartCheckActivity"
+            android:name=".view.ui.first.StartActivity"
             android:theme="@style/AppTheme"
             android:exported="true">
             <intent-filter>
@@ -141,7 +143,6 @@
         <activity android:name=".view.ui.about.AboutActivity" />
         <activity android:name=".view.ui.commons.ExpandedStreamBrowseActivity" />
         <activity android:name=".view.ui.commons.EditorStreamBrowseActivity" />
-        <activity android:name=".BlockerActivity" android:label="アンインストールブロッカー" android:theme="@style/BlockerTheme" />
 
         <service android:name=".data.service.NotificationService" />
         <service android:name=".data.installer.InstallerService" />

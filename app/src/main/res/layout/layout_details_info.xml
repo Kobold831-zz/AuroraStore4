@@ -85,7 +85,8 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/txt_speed"
-                style="@style/TextAppearance.Aurora.SubTitle.Alt"
+                android:textSize="18sp"
+                android:textColor="@color/colorBlack"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/download_speed_estimating" />

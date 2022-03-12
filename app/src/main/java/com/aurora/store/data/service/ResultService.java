@@ -3,7 +3,6 @@ package com.aurora.store.data.service;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.aurora.store.R;
 import com.aurora.store.data.event.InstallerEvent;

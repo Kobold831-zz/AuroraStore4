@@ -1,11 +1,11 @@
-package com.aurora.store.check;
+package com.aurora.store.data.connection;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.AsyncTask;
 
-import com.aurora.store.check.event.UpdateEventListener;
-import com.aurora.store.check.event.UpdateEventListenerList;
+import com.aurora.store.data.event.UpdateEventListener;
+import com.aurora.store.data.event.UpdateEventListenerList;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

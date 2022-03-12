@@ -347,39 +347,45 @@
     <string name="toast_export_success">端末設定をエクスポートしました</string>
     <string name="pref_updates_extended_desc">無効化したアプリの更新も確認する</string>
     <string name="pref_updates_extended">追加アップデート</string>
-    <string name="pref_owner_title">その他の設定</string>
-    <string name="pref_owner_cate">DeviceOwner</string>
-    <string name="pref_owner_disable">DeviceOwnerを解除</string>
+    <string name="pref_other_title">その他の設定</string>
+    <string name="pref_other_title_owner">デバイスオーナーを解除</string>
+    <string name="pref_other_title_update">アップデートモードを選択</string>
 
     <!-- ダイアログ -->
-    <string name="dialog_clear_device_owner">DeviceOwnerを解除しますか？</string>
-    <string name="dialog_agree">同意する</string>
-    <string name="dialog_disagree">同意しない</string>
-    <string name="dialog_title_update">アプリの更新</string>
-    <string name="dialog_title_common_error">起動エラー</string>
     <string name="dialog_common_ok">OK</string>
     <string name="dialog_common_yes">はい</string>
     <string name="dialog_common_no">いいえ</string>
-    <string name="dialog_clear_owner">解除</string>
-    <string name="dialog_error_not_neo">この端末は”チャレンジパッドNEO・NEXT”ではありません\nこのアプリは使用できません</string>
+    <string name="dialog_common_cancel">キャンセル</string>
     <string name="dialog_title_notice_start">利用上の注意</string>
+    <string name="dialog_title_update">アプリの更新</string>
+    <string name="dialog_title_start_error">起動エラー</string>
+    <string name="dialog_title_select_mode">モードを選択してください</string>
+    <string name="dialog_title_settings">設定</string>
+    <string name="dialog_error">エラーが発生しました</string>
+    <string name="dialog_error_connection">サーバーと接続できませんでした\n通信状態を確認してください</string>
+    <string name="dialog_error_not_neo">この端末は”チャレンジパッドNEO・NEXT”ではありません\nこのアプリは使用できません</string>
+    <string name="dialog_error_wifi">通信エラーが発生しました\nネットワークに接続してください</string>
+    <string name="dialog_error_not_use">このアプリは使用できません</string>
+    <string name="dialog_error_failure_bind">デバイスオーナーではないためこのアプリは使用できません\n自動回避としてCPad Customize Toolの検出を試みましたが失敗しました</string>
+    <string name="dialog_error_bind_no_owner">デバイスオーナーではないためこのアプリは使用できません\n自動回避としてCPad Customize Toolを検出しましたがデバイスオーナーではありません</string>
+    <string name="dialog_error_failure_connection">CPad Customize Toolとの接続に失敗しました</string>
+    <string name="dialog_error_not_work_mode">選択されたモードは機能していないため設定できません</string>
+    <string name="dialog_error_reset_update_mode">デバイスオーナーではありません\nアップデートモードをリセットしました</string>
+    <string name="dialog_clear_device_owner">デバイスオーナーを解除しますか？</string>
+    <string name="dialog_agree">同意する</string>
+    <string name="dialog_disagree">同意しない</string>
+    <string name="dialog_clear_owner">解除</string>
     <string name="dialog_notice_start">このアプリケーションを利用するにあたって「同意する」を押した時点で、CTabWikiの許諾規約およびこの規約に同意するものとし、開発者は一切の問題において責任を負わないものとします</string>
-    <string name="dialog_wifi_error">通信エラーが発生しました\nネットワークに接続してください</string>
-    <string name="dialog_connection_error">サーバーと接続できませんでした\n通信状態を確認してください</string>
-    <string name="dialog_not_use">このアプリは使用できません</string>
-    <string name="dialog_not_device_owner_failure_bind">DeviceOwnerではないためこのアプリは使用できません\n自動回避としてCPad Customize Toolの検出を試みましたが失敗しました</string>
-    <string name="dialog_not_device_owner_failure_no_owner">DeviceOwnerではないためこのアプリは使用できません\n自動回避としてCPad Customize Toolを検出しましたがDeviceOwnerではありません</string>
-    <string name="dialog_update_caution">ご利用のデバイスではコンピュータ経由でアップデートする必要があります\n遷移先のページより新しいバージョンのapkファイルをダウンロードしてadbでインストールしてください</string>
-    <string name="dialog_error">エラーが発生しました\n</string>
+    <string name="dialog_update_caution">遷移先のページより新しいバージョンのapkファイルをダウンロードしてadbでインストールしてください</string>
 
     <!-- トースト -->
     <string name="toast_unknown_activity">ブラウザを開けませんでした</string>
 
     <!-- レイアウト -->
-    <string name="layout_update_dialog_update_info">アップデートがあります\nアップデートしてください\nアップデートをしないと利用できません\n\n更新情報：\n</string>
-    <string name="layout_update_dialog_update_detail_info">詳細な更新情報</string>
+    <string name="layout_update_info">アップデートがあります\nアップデートしてください\nアップデートをしないと利用できません\n\n更新情報：\n</string>
+    <string name="layout_update_detail_info">詳細な更新情報</string>
 
-    <!-- ブロッカー -->
-    <string name="un_text_1">すべて無効</string>
-    <string name="un_text_2">すべて有効</string>
+    <!-- プログレス -->
+    <string name="progress_state_connection">通信中です…</string>
+    <string name="progress_state_downloading_update_file">アップデートファイルをサーバーからダウンロード中…</string>
 </resources>

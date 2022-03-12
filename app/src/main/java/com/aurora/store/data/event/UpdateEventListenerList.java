@@ -1,4 +1,6 @@
-package com.aurora.store.check.event;
+package com.aurora.store.data.event;
+
+import com.aurora.store.data.event.UpdateEventListener;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,20 +13,16 @@ public class UpdateEventListenerList {
 		listeners.add(l);
 	}
 
+	public void downloadCompleteNotify() {
+		for (UpdateEventListener listener : listeners) listener.onUpdateApkDownloadComplete();
+	}
+
 	public void updateAvailableNotify(String mString) {
 		for (UpdateEventListener listener : listeners) listener.onUpdateAvailable(mString);
 	}
 
 	public void updateUnavailableNotify() {
 		for (UpdateEventListener listener : listeners) listener.onUpdateUnavailable();
-	}
-
-	public void updateAvailableNotify1(String mString) {
-		for (UpdateEventListener listener : listeners) listener.onUpdateAvailable1(mString);
-	}
-
-	public void updateUnavailableNotify1() {
-		for (UpdateEventListener listener : listeners) listener.onUpdateUnavailable1();
 	}
 
 	public void supportAvailableNotify() {
@@ -37,5 +35,9 @@ public class UpdateEventListenerList {
 
 	public void connectionErrorNotify() {
 		for (UpdateEventListener listener : listeners) listener.onConnectionError();
+	}
+
+	public void downloadErrorNotify() {
+		for (UpdateEventListener listener : listeners) listener.onDownloadError();
 	}
 }

@@ -28,11 +28,15 @@ import android.content.ServiceConnection
 import android.content.pm.PackageInstaller.SessionParams
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import com.aurora.extensions.isNAndAbove
 import com.aurora.store.BuildConfig
+import com.aurora.store.R
+import com.aurora.store.util.Common
 import com.aurora.store.util.Log
 import com.saradabar.cpadcustomizetool.data.service.IDeviceOwnerService
 import org.apache.commons.io.IOUtils
@@ -63,7 +67,14 @@ class SessionInstaller(context: Context) : InstallerBase(context) {
             ) {
                 xInstall(packageName, uriList)
             } else if (bindDeviceOwnerService()) {
-                ownerInstall(packageName, uriList)
+                oInstall(packageName, uriList)
+            } else {
+                removeFromInstallQueue(packageName)
+                postError(
+                    packageName,
+                    context.getString(R.string.dialog_error_failure_connection),
+                    null
+                )
             }
         }
     }
@@ -118,17 +129,19 @@ class SessionInstaller(context: Context) : InstallerBase(context) {
         }
     }
 
-    private fun ownerInstall(packageName: String, uriList: List<Uri>) {
+    private fun oInstall(packageName: String, uriList: List<Uri>) {
         try {
-            Thread.sleep(1000)
-            if(!mDeviceOwnerService?.installPackages(packageName, uriList)!!) {
-                removeFromInstallQueue(packageName)
-                postError(
-                    packageName,
-                    "エラー",
-                    ""
-                )
+            val runnable = Runnable {
+                if (!mDeviceOwnerService?.installPackages(packageName, uriList)!!) {
+                    removeFromInstallQueue(packageName)
+                    postError(
+                        packageName,
+                        context.getString(R.string.dialog_error),
+                        null
+                    )
+                }
             }
+            Handler(Looper.getMainLooper()).postDelayed(runnable, 1000)
         } catch (e: Exception) {
             removeFromInstallQueue(packageName)
             postError(
@@ -151,24 +164,25 @@ class SessionInstaller(context: Context) : InstallerBase(context) {
             uri,
             Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         )
-
         return uri
+    }
+
+    var mServiceConnection: ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(componentName: ComponentName, iBinder: IBinder) {
+            mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(iBinder)
+        }
+
+        override fun onServiceDisconnected(componentName: ComponentName) {
+            mDeviceOwnerService = null
+        }
     }
 
     fun bindDeviceOwnerService(): Boolean {
         try {
             return context.bindService(
-                Intent("com.saradabar.cpadcustomizetool.data.service.DeviceOwnerService").setPackage(
-                    "com.saradabar.cpadcustomizetool"
-                ), object : ServiceConnection {
-                    override fun onServiceConnected(name: ComponentName, service: IBinder) {
-                        mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service)
-                    }
-
-                    override fun onServiceDisconnected(name: ComponentName) {
-                        context.unbindService(this)
-                    }
-                }, Context.BIND_AUTO_CREATE
+                Common.BIND_CUSTOMIZE_TOOL,
+                mServiceConnection,
+                Context.BIND_AUTO_CREATE
             )
         } catch (ignored: Exception) {
             return false

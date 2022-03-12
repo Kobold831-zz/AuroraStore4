@@ -48,7 +48,7 @@
         android:layout_gravity="center_horizontal|bottom"
         android:layout_marginBottom="@dimen/margin_normal"
         android:text="@string/action_filter"
-        android:textAppearance="@style/TextAppearance.Aurora.SubTitle.Alt"
+        android:textSize="18sp"
         android:textColor="@color/colorWhite"
         app:backgroundTint="@color/colorAccent"
         app:icon="@drawable/ic_filter"

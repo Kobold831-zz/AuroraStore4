@@ -37,11 +37,11 @@
         android:text="@string/onboarding_title_welcome"
         android:textAlignment="textStart"
         android:textColor="?colorAccent"
-        android:textSize="42sp"
-        app:fontFamily="@font/montserrat_regular" />
+        android:textSize="42sp" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        style="@style/AuroraTextStyle.Subtitle.Alt"
+        android:textSize="18sp"
+        android:textColor="@color/colorBlack"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/padding_normal"

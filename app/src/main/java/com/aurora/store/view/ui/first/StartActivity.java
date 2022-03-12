@@ -1,15 +1,4 @@
-package com.aurora.store;
-
-import static com.aurora.store.Common.GET_SETTINGS_FLAG;
-import static com.aurora.store.Common.SET_SETTINGS_FLAG;
-import static com.aurora.store.Common.Variable.REQUEST_UPDATE;
-import static com.aurora.store.Common.Variable.SETTINGS_COMPLETED;
-import static com.aurora.store.Common.Variable.SETTINGS_NOT_COMPLETED;
-import static com.aurora.store.Common.Variable.SUPPORT_CHECK_URL;
-import static com.aurora.store.Common.Variable.UPDATE_CHECK_URL;
-import static com.aurora.store.Common.Variable.UPDATE_INFO_URL;
-import static com.aurora.store.Common.Variable.UPDATE_URL;
-import static com.aurora.store.Common.Variable.toast;
+package com.aurora.store.view.ui.first;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -17,6 +6,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
@@ -24,26 +14,37 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.aurora.Constants;
 import com.aurora.extensions.ContextKt;
-import com.aurora.store.check.Checker;
-import com.aurora.store.check.Updater;
-import com.aurora.store.check.event.UpdateEventListener;
+import com.aurora.extensions.ToastKt;
+import com.aurora.store.R;
+import com.aurora.store.data.connection.AsyncFileDownload;
+import com.aurora.store.data.connection.Checker;
+import com.aurora.store.data.connection.Updater;
+import com.aurora.store.data.event.UpdateEventListener;
+import com.aurora.store.data.handler.ProgressHandler;
+import com.aurora.store.util.Common;
+import com.aurora.store.view.epoxy.views.UpdateModeView;
 import com.aurora.store.view.ui.onboarding.OnboardingActivity;
 import com.saradabar.cpadcustomizetool.data.service.IDeviceOwnerService;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-public class StartCheckActivity extends AppCompatActivity implements UpdateEventListener {
+public class StartActivity extends AppCompatActivity implements UpdateEventListener {
 
     IDeviceOwnerService mDeviceOwnerService;
     DevicePolicyManager mDevicePolicyManager;
@@ -52,7 +53,6 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
     @Override
     public final void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        bindDeviceOwnerService();
         mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         /* ネットワークチェック */
         if (!isNetWork()) {
@@ -73,9 +73,8 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
     private void netWorkError() {
         new AlertDialog.Builder(this)
                 .setCancelable(false)
-                .setIcon(R.drawable.alert)
-                .setTitle(R.string.dialog_title_common_error)
-                .setMessage(R.string.dialog_wifi_error)
+                .setTitle(R.string.dialog_title_start_error)
+                .setMessage(R.string.dialog_error_wifi)
                 .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> {
                     if (mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
                         new AlertDialog.Builder(this)
@@ -94,19 +93,11 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
 
     private void updateCheck() {
         showLoadingDialog();
-        new Updater(this, UPDATE_CHECK_URL, 1).updateCheck();
+        new Updater(this).updateCheck();
     }
 
     private void supportCheck() {
-        new Checker(this, SUPPORT_CHECK_URL).supportCheck();
-    }
-
-    @Override
-    public void onUpdateAvailable(String string) {
-    }
-
-    @Override
-    public void onUpdateUnavailable() {
+        new Checker(this, Constants.SUPPORT_CHECK_URL).supportCheck();
     }
 
     public void onSupportAvailable() {
@@ -119,43 +110,18 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
         if (checkModel()) {
             if (!mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
                 if (bindDeviceOwnerService()) {
-                    try {
-                        if (mDeviceOwnerService.isDeviceOwnerApp()) {
-                            if (GET_SETTINGS_FLAG(this) == SETTINGS_NOT_COMPLETED) {
-                                startCheck();
-                            } else {
-                                startActivity(new Intent(this, OnboardingActivity.class));
-                                finish();
-                            }
-                        } else {
-                            new AlertDialog.Builder(this)
-                                    .setCancelable(false)
-                                    .setIcon(R.drawable.alert)
-                                    .setTitle(R.string.dialog_title_common_error)
-                                    .setMessage(R.string.dialog_not_device_owner_failure_no_owner)
-                                    .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> finishAndRemoveTask())
-                                    .show();
-                        }
-                    } catch (Exception e) {
-                        new AlertDialog.Builder(this)
-                                .setCancelable(false)
-                                .setIcon(R.drawable.alert)
-                                .setTitle(R.string.dialog_title_common_error)
-                                .setMessage(getResources().getString(R.string.dialog_error) + e.getMessage())
-                                .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> finishAndRemoveTask())
-                                .show();
-                    }
+                    Runnable runnable = this::isDeviceOwner;
+                    new Handler().postDelayed(runnable, 1000);
                 } else {
                     new AlertDialog.Builder(this)
                             .setCancelable(false)
-                            .setIcon(R.drawable.alert)
-                            .setTitle(R.string.dialog_title_common_error)
-                            .setMessage(R.string.dialog_not_device_owner_failure_bind)
+                            .setTitle(R.string.dialog_title_start_error)
+                            .setMessage(R.string.dialog_error_failure_bind)
                             .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> finishAndRemoveTask())
                             .show();
                 }
             } else {
-                if (GET_SETTINGS_FLAG(this) == SETTINGS_NOT_COMPLETED) {
+                if (Common.GET_SETTINGS_FLAG(this) == Constants.SETTINGS_NOT_COMPLETED) {
                     startCheck();
                 } else {
                     startActivity(new Intent(this, OnboardingActivity.class));
@@ -168,13 +134,76 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
     }
 
     @Override
-    public void onUpdateAvailable1(String string) {
+    public void onDownloadError() {
+        cancelLoadingDialog();
+        new AlertDialog.Builder(this)
+                .setCancelable(false)
+                .setTitle(R.string.dialog_title_update)
+                .setMessage(R.string.dialog_error)
+                .setPositiveButton(R.string.dialog_common_yes, (dialog, which) -> finishAffinity())
+                .show();
+    }
+
+    public void isDeviceOwner() {
+        try {
+            if (mDeviceOwnerService.isDeviceOwnerApp()) {
+                if (Common.GET_SETTINGS_FLAG(this) == Constants.SETTINGS_NOT_COMPLETED) {
+                    startCheck();
+                } else {
+                    startActivity(new Intent(this, OnboardingActivity.class));
+                    finish();
+                }
+            } else {
+                new AlertDialog.Builder(this)
+                        .setCancelable(false)
+                        .setTitle(R.string.dialog_title_start_error)
+                        .setMessage(R.string.dialog_error_bind_no_owner)
+                        .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> finishAndRemoveTask())
+                        .show();
+            }
+        } catch (Exception e) {
+            new AlertDialog.Builder(this)
+                    .setCancelable(false)
+                    .setTitle(R.string.dialog_title_start_error)
+                    .setMessage(getResources().getString(R.string.dialog_error) + "\n" + e.getMessage())
+                    .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> finishAndRemoveTask())
+                    .show();
+        }
+    }
+
+    ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(iBinder);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mDeviceOwnerService = null;
+        }
+    };
+
+    public boolean bindDeviceOwnerService() {
+        try {
+            return bindService(Common.BIND_CUSTOMIZE_TOOL, mServiceConnection, Context.BIND_AUTO_CREATE);
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    @Override
+    public void onUpdateApkDownloadComplete() {
+        new Handler().post(() -> new Updater(this).installApk());
+    }
+
+    @Override
+    public void onUpdateAvailable(String string) {
         cancelLoadingDialog();
         showUpdateDialog(string);
     }
 
     @Override
-    public void onUpdateUnavailable1() {
+    public void onUpdateUnavailable() {
         supportCheck();
     }
 
@@ -183,9 +212,8 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
         cancelLoadingDialog();
         new AlertDialog.Builder(this)
                 .setCancelable(false)
-                .setIcon(R.drawable.alert)
-                .setTitle(R.string.dialog_title_common_error)
-                .setMessage(R.string.dialog_connection_error)
+                .setTitle(R.string.dialog_title_start_error)
+                .setMessage(R.string.dialog_error_connection)
                 .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> {
                     if (mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
                         new AlertDialog.Builder(this)
@@ -202,17 +230,15 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
                 .show();
     }
 
-    private void showUpdateDialog(String string) {
+    private void showUpdateDialog(String str) {
         View view = getLayoutInflater().inflate(R.layout.update_dialog, null);
         TextView mTextView = view.findViewById(R.id.update_information);
-        mTextView.setText(string);
+        mTextView.setText(str);
         view.findViewById(R.id.update_info_button).setOnClickListener(v -> {
             try {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(UPDATE_INFO_URL)).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.UPDATE_INFO_URL)).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
             } catch (ActivityNotFoundException ignored) {
-                if (toast != null) toast.cancel();
-                toast = Toast.makeText(this, R.string.toast_unknown_activity, Toast.LENGTH_SHORT);
-                toast.show();
+                ToastKt.toast(this, R.string.toast_unknown_activity);
             }
         });
 
@@ -220,34 +246,101 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
                 .setView(view)
                 .setCancelable(false)
                 .setTitle(R.string.dialog_title_update)
-                .setPositiveButton(R.string.dialog_common_yes, (dialog, which) -> new AlertDialog.Builder(this)
-                        .setCancelable(false)
-                        .setTitle(R.string.dialog_title_update)
-                        .setMessage(R.string.dialog_update_caution)
-                        .setPositiveButton(R.string.dialog_common_yes, (dialog2, which2) -> {
-                            try {
-                                startActivityForResult(new Intent(Intent.ACTION_VIEW, Uri.parse(UPDATE_URL)).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION), REQUEST_UPDATE);
-                            } catch (ActivityNotFoundException ignored) {
-                                if (toast != null) toast.cancel();
-                                toast = Toast.makeText(this, R.string.toast_unknown_activity, Toast.LENGTH_SHORT);
-                                toast.show();
-                                if (isNetWork()) {
-                                    showLoadingDialog();
-                                    supportCheck();
-                                } else netWorkError();
-                            }
-                        })
-                        .show())
-                .setNegativeButton(R.string.dialog_common_no, (dialog, which) -> finishAndRemoveTask())
+                .setPositiveButton(R.string.dialog_common_yes, (dialog, which) -> {
+                    AsyncFileDownload asyncFileDownload = initFileLoader();
+                    ProgressDialog progressDialog = new ProgressDialog(this);
+                    progressDialog.setTitle(R.string.dialog_title_update);
+                    progressDialog.setMessage(getString(R.string.progress_state_downloading_update_file));
+                    progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                    progressDialog.setProgress(0);
+                    progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.dialog_common_cancel), (dialog2, which2) -> {
+                        asyncFileDownload.cancel(true);
+                        finishAffinity();
+                    });
+                    if (!progressDialog.isShowing()) progressDialog.show();
+                    ProgressHandler progressHandler = new ProgressHandler();
+                    progressHandler.progressDialog = progressDialog;
+                    progressHandler.asyncfiledownload = asyncFileDownload;
+                    progressHandler.sendEmptyMessage(0);
+                })
+                .setNegativeButton(R.string.dialog_common_no, (dialog, which) -> finishAffinity())
+                .setNeutralButton(R.string.dialog_title_settings, (dialog, which) -> {
+                    dialog.dismiss();
+                    setUpdateMode(str);
+                })
+                .show();
+    }
+
+    private AsyncFileDownload initFileLoader() {
+        AsyncFileDownload asyncfiledownload = new AsyncFileDownload(this, Common.DOWNLOAD_FILE_URL, new File(getExternalCacheDir(), "update.apk"));
+        asyncfiledownload.execute();
+        return asyncfiledownload;
+    }
+
+    private void setUpdateMode(String s) {
+        View v = getLayoutInflater().inflate(R.layout.layout_update_list, null);
+        List<String> list = new ArrayList<>();
+        list.add("ADB");
+        list.add("デバイスオーナー");
+        list.add("CPad Customize Tool");
+        List<UpdateModeView.AppData> dataList = new ArrayList<>();
+        int i = 0;
+        for (String str : list) {
+            UpdateModeView.AppData data = new UpdateModeView.AppData();
+            data.label = str;
+            data.updateMode = i;
+            dataList.add(data);
+            i++;
+        }
+        ListView listView = v.findViewById(R.id.update_list);
+        listView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+        listView.setAdapter(new UpdateModeView.AppListAdapter(this, dataList));
+        listView.setOnItemClickListener((parent, mView, position, id) -> {
+            switch (position) {
+                case 0:
+                    Common.SET_UPDATE_MODE(this, (int) id);
+                    listView.invalidateViews();
+                    break;
+                case 1:
+                    if (((DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE)).isDeviceOwnerApp(getPackageName())) {
+                        Common.SET_UPDATE_MODE(this, (int) id);
+                        listView.invalidateViews();
+                    } else {
+                        new AlertDialog.Builder(this)
+                                .setMessage(getString(R.string.dialog_error_not_work_mode))
+                                .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> dialog.dismiss())
+                                .show();
+                    }
+                    break;
+                case 2:
+                    if (bindDeviceOwnerService()) {
+                        Common.SET_UPDATE_MODE(this, 2);
+                        listView.invalidateViews();
+                    } else {
+                        new AlertDialog.Builder(this)
+                                .setMessage(getString(R.string.dialog_error_not_work_mode))
+                                .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> dialog.dismiss())
+                                .show();
+                    }
+                    break;
+            }
+        });
+        new AlertDialog.Builder(this)
+                .setView(v)
+                .setCancelable(false)
+                .setTitle(getString(R.string.dialog_title_select_mode))
+                .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> {
+                    dialog.dismiss();
+                    showUpdateDialog(s);
+                })
                 .show();
     }
 
     private void showSupportDialog() {
         new AlertDialog.Builder(this)
                 .setCancelable(false)
-                .setIcon(R.drawable.alert)
-                .setTitle(R.string.dialog_title_common_error)
-                .setMessage(R.string.dialog_not_use)
+                .setTitle(R.string.dialog_title_start_error)
+                .setMessage(R.string.dialog_error_not_use)
                 .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> {
                     if (mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
                         new AlertDialog.Builder(this)
@@ -265,7 +358,7 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
     }
 
     private void showLoadingDialog() {
-        loadingDialog = ProgressDialog.show(this, "", "通信中です・・・", true);
+        loadingDialog = ProgressDialog.show(this, "", getString(R.string.progress_state_connection), true);
         loadingDialog.show();
     }
 
@@ -273,25 +366,6 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
         try {
             if (loadingDialog != null) loadingDialog.dismiss();
         } catch (Exception ignored) {
-        }
-    }
-
-    public boolean bindDeviceOwnerService() {
-        try {
-            return bindService(new Intent("com.saradabar.cpadcustomizetool.data.service.DeviceOwnerService").setPackage("com.saradabar.cpadcustomizetool"), new ServiceConnection() {
-                @Override
-                public void onServiceConnected(ComponentName name, IBinder service) {
-                    mDeviceOwnerService = IDeviceOwnerService.Stub.asInterface(service);
-                    unbindService(this);
-                }
-
-                @Override
-                public void onServiceDisconnected(ComponentName name) {
-                    unbindService(this);
-                }
-            }, Context.BIND_AUTO_CREATE);
-        } catch (Exception ignored) {
-            return false;
         }
     }
 
@@ -310,8 +384,7 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
     private void errorNotNEO() {
         new AlertDialog.Builder(this)
                 .setCancelable(false)
-                .setTitle(R.string.dialog_title_common_error)
-                .setIcon(R.drawable.alert)
+                .setTitle(R.string.dialog_title_start_error)
                 .setMessage(R.string.dialog_error_not_neo)
                 .setPositiveButton(R.string.dialog_common_ok, (dialog, which) -> {
                     if (mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
@@ -346,12 +419,11 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
             alertDialog1.dismiss();
             new AlertDialog.Builder(this)
                     .setCancelable(false)
-                    .setIcon(R.drawable.alert)
                     .setTitle(R.string.dialog_title_notice_start)
                     .setMessage(R.string.dialog_notice_start)
                     .setPositiveButton(R.string.dialog_agree, (dialog, which) -> {
 
-                        SET_SETTINGS_FLAG(SETTINGS_COMPLETED, this);
+                        Common.SET_SETTINGS_FLAG(Constants.SETTINGS_COMPLETED, this);
                         startActivity(new Intent(this, OnboardingActivity.class));
                         finish();
                     })
@@ -377,8 +449,14 @@ public class StartCheckActivity extends AppCompatActivity implements UpdateEvent
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_UPDATE) {
+        if (requestCode == Constants.REQUEST_UPDATE) {
             finishAndRemoveTask();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mDeviceOwnerService != null) unbindService(mServiceConnection);
     }
 }

@@ -20,6 +20,11 @@
 package com.aurora
 
 object Constants {
+
+    const val REQUEST_UPDATE = 10
+    const val SETTINGS_NOT_COMPLETED = false
+    const val SETTINGS_COMPLETED = true
+
     const val INT_EXTRA = "INT_EXTRA"
     const val STRING_APP = "STRING_APP"
     const val STRING_EXTRA = "STRING_EXTRA"
@@ -27,6 +32,10 @@ object Constants {
 
     const val FETCH_GROUP_ID = "FETCH_GROUP_ID"
 
+    const val UPDATE_CHECK_URL = "https://raw.githubusercontent.com/Kobold831/Server/main/AuroraStore_Update.xml"
+    const val SUPPORT_CHECK_URL = "https://raw.githubusercontent.com/Kobold831/Server/main/AuroraStore_Support.xml"
+    const val UPDATE_INFO_URL = "https://docs.google.com/document/d/19GmLgF7rf6WblrY8MCJjqTKbSwLqMRzH_MyvMR38d2o"
+    const val UPDATE_URL = "https://is.gd/GLTPxY"
     const val EXODUS_REPORT_URL = "https://reports.exodus-privacy.eu.org/reports/"
     const val SHARE_URL = "https://play.google.com/store/apps/details?id="
     const val TOS_URL = "https://gitlab.com/AuroraOSS/AuroraStore/-/blob/master/TermsOfService.md"
