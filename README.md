@@ -56,12 +56,12 @@ Please visit the [Aurora Wiki](https://auroraoss.com/faq/) on our website. You c
 Don't see your preferred language? Click on the widget below to help translate Aurora Store!
 
 <a href="https://hosted.weblate.org/engage/aurora-store/">
-  <img src="https://hosted.weblate.org/widgets/aurora-store/-/strings/horizontal-auto.svg" alt="Translation status" />
+  <img src="https://hosted.weblate.org/static/weblate-black.svg" alt="Translation status" />
 </a>
 
 ## Supported by
 
-[<img src="https://fosshost.org/img/FosshostLogo.png" width="400">](https://fosshost.org/)
+[<img src="https://fosshost.org/img/fosshost-logo.png" width="400">](https://fosshost.org/)
 
 ## Project references
 
